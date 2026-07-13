@@ -12,19 +12,16 @@
 #
 # DESCRICAO
 # --------------------------------------------------------------
-# Responsavel pelo controle dos ventiladores do condensador.
+# Controla os dois ventiladores do condensador.
 #
-# Recursos:
+# Fan 1:
+#   Ligado enquanto o compressor estiver ligado.
 #
-#   • Ventilador 1
-#   • Ventilador 2
-#   • Controle por pressao de descarga
+# Fan 2:
+#   Controlado pela pressao de descarga com histerese.
 #
-# O ventilador 1 permanece ligado sempre que o compressor
-# estiver em funcionamento.
-#
-# O ventilador 2 e acionado automaticamente conforme a
-# pressao de descarga utilizando histerese.
+# As mensagens sao exibidas somente quando ocorre mudanca
+# real nas saidas.
 # ==============================================================
 
 from controllers.condensacao import CondensacaoController
@@ -35,24 +32,11 @@ class Condensador:
     Controle dos ventiladores do condensador.
     """
 
-    # ==========================================================
-    # INICIALIZACAO
-    # ==========================================================
-
     def __init__(self):
-        """
-        Inicializa os ventiladores e o controlador de
-        condensacao.
-        """
-
         self.ventilador_1 = False
         self.ventilador_2 = False
 
         self.controle = CondensacaoController()
-
-    # ==========================================================
-    # CONTROLE DOS VENTILADORES
-    # ==========================================================
 
     def controlar(
         self,
@@ -60,81 +44,43 @@ class Condensador:
         pressao_descarga
     ):
         """
-        Controla os ventiladores do condensador.
-
-        Regras:
-
-            Compressor OFF
-
-                • Fan 1 OFF
-                • Fan 2 OFF
-
-            Compressor ON
-
-                • Fan 1 ON
-
-                • Fan 2 controlado pela
-                  pressao de descarga.
+        Atualiza os ventiladores conforme o compressor
+        e a pressao de descarga.
         """
 
-        # ------------------------------------------------------
-        # COMPRESSOR DESLIGADO
-        # ------------------------------------------------------
+        estado_anterior_fan1 = self.ventilador_1
+        estado_anterior_fan2 = self.ventilador_2
 
         if not compressor_ligado:
-
             self.ventilador_1 = False
             self.ventilador_2 = False
 
-            # Reinicia a histerese do controlador.
             self.controle.resetar()
 
+        else:
+            self.ventilador_1 = True
+
+            self.ventilador_2 = (
+                self.controle.segundo_ventilador(
+                    pressao_descarga
+                )
+            )
+
+        if estado_anterior_fan1 != self.ventilador_1:
             print(
-                "DO_VentiladorCondensador_1 = OFF"
+                "DO_VentiladorCondensador_1 = "
+                f"{'ON' if self.ventilador_1 else 'OFF'}"
             )
 
+        if estado_anterior_fan2 != self.ventilador_2:
             print(
-                "DO_VentiladorCondensador_2 = OFF"
+                "DO_VentiladorCondensador_2 = "
+                f"{'ON' if self.ventilador_2 else 'OFF'}"
             )
-
-            return
-
-        # ------------------------------------------------------
-        # COMPRESSOR LIGADO
-        # ------------------------------------------------------
-
-        # O ventilador principal permanece ligado durante toda
-        # a refrigeracao.
-
-        self.ventilador_1 = True
-
-        # O segundo ventilador e acionado automaticamente pelo
-        # controlador de condensacao.
-
-        self.ventilador_2 = (
-            self.controle.segundo_ventilador(
-                pressao_descarga
-            )
-        )
-
-        print(
-            "DO_VentiladorCondensador_1 = ON"
-        )
-
-        print(
-            "DO_VentiladorCondensador_2 = "
-            f"{'ON' if self.ventilador_2 else 'OFF'}"
-        )
-
-    # ==========================================================
-    # STATUS DOS VENTILADORES
-    # ==========================================================
 
     def status(self):
         """
         Retorna o estado atual dos ventiladores.
-
-        Utilizado para futuras telas da HMI e diagnosticos.
         """
 
         return {

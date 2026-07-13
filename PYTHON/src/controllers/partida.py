@@ -12,77 +12,31 @@
 #
 # DESCRICAO
 # --------------------------------------------------------------
-# Responsavel por autorizar ou bloquear a partida da maquina.
-#
-# A partida somente sera liberada quando nao existir nenhum
-# alarme ativo no sistema.
+# Autoriza ou bloqueia o funcionamento da maquina conforme
+# a existencia de alarmes ativos.
 # ==============================================================
 
 
 class PartidaController:
     """
-    Controlador da permissao de partida.
+    Controlador da permissao de funcionamento.
     """
 
-    # ==========================================================
-    # INICIALIZACAO
-    # ==========================================================
-
     def __init__(self):
-        """
-        Inicializa o estado da partida.
-        """
-
         self.habilitado = True
-
-    # ==========================================================
-    # LIBERACAO DA PARTIDA
-    # ==========================================================
 
     def liberar(self, alarmes):
         """
-        Verifica se a maquina pode iniciar a refrigeracao.
-
-        Parametro:
-
-            alarmes
-                Lista contendo todos os alarmes ativos.
-
-        Retorno:
-
-            True
-                Partida liberada.
-
-            False
-                Partida bloqueada.
+        Libera a maquina somente quando nao existem alarmes.
         """
 
         self.habilitado = len(alarmes) == 0
 
-        if self.habilitado:
-
-            print("Partida liberada.")
-
-        else:
-
-            print("Partida bloqueada.")
-
-            for alarme in alarmes:
-                print(f"ALARME: {alarme}")
-
         return self.habilitado
-
-    # ==========================================================
-    # STATUS
-    # ==========================================================
 
     def status(self):
         """
-        Retorna o estado atual da permissao de partida.
-
-        True  -> Liberada
-
-        False -> Bloqueada
+        Retorna o estado da permissao.
         """
 
         return self.habilitado

@@ -16,14 +16,11 @@
 #
 # Sensores simulados:
 #
-# • Temperatura da camara
-# • Temperatura do evaporador
-# • Pressao de succao
-# • Pressao de descarga
-# • Pressao de oleo
-#
-# Os valores sao atualizados automaticamente conforme o estado
-# do compressor, permitindo validar toda a logica da maquina.
+#   - Temperatura da camara
+#   - Temperatura do evaporador
+#   - Pressao de succao
+#   - Pressao de descarga
+#   - Pressao de oleo
 # ==============================================================
 
 
@@ -32,15 +29,7 @@ class Sensores:
     Simulacao dos sensores da maquina.
     """
 
-    # ==========================================================
-    # INICIALIZACAO
-    # ==========================================================
-
     def __init__(self):
-        """
-        Inicializa os valores simulados dos sensores.
-        """
-
         self.temp_camara = -15.0
         self.temp_evaporador = -22.0
 
@@ -48,33 +37,25 @@ class Sensores:
         self.pressao_descarga = 260.0
         self.pressao_oleo = 45.0
 
-    # ==========================================================
-    # ATUALIZACAO DOS SENSORES
-    # ==========================================================
-
     def atualizar(self, compressor_ligado):
         """
-        Atualiza os sensores de acordo com o estado do compressor.
+        Atualiza os sensores conforme o estado do compressor.
 
         Compressor ligado:
-
-            • Camara esfria
-            • Evaporador esfria
-            • Succao diminui
-            • Descarga aumenta
+            - Camara esfria
+            - Evaporador esfria
+            - Succao diminui
+            - Descarga aumenta
 
         Compressor desligado:
-
-            • Camara aquece lentamente
-            • Evaporador aquece
-            • Succao aumenta
-            • Descarga diminui
+            - Camara aquece lentamente
+            - Evaporador retorna gradualmente para uma
+              temperatura de equilibrio
+            - Succao aumenta
+            - Descarga diminui
         """
 
         if compressor_ligado:
-
-            # Refrigeração
-
             self.temp_camara -= 0.3
             self.temp_evaporador -= 0.5
 
@@ -86,11 +67,17 @@ class Sensores:
             self.pressao_descarga += 0.5
 
         else:
-
-            # Sistema parado
-
             self.temp_camara += 0.2
-            self.temp_evaporador += 0.3
+
+            # O evaporador nao deve continuar aquecendo
+            # indefinidamente apos o degelo.
+            #
+            # Acima de 0 °C ele perde calor gradualmente.
+            # Abaixo de 0 °C ele aquece lentamente.
+            if self.temp_evaporador > 0.0:
+                self.temp_evaporador -= 0.4
+            else:
+                self.temp_evaporador += 0.3
 
             self.pressao_succao += 0.2
 
@@ -99,13 +86,9 @@ class Sensores:
                 self.pressao_descarga - 0.5
             )
 
-    # ==========================================================
-    # EXIBICAO DOS SENSORES
-    # ==========================================================
-
     def exibir(self):
         """
-        Exibe todos os sensores simulados.
+        Exibe os valores atuais dos sensores.
         """
 
         print(
@@ -116,43 +99,20 @@ class Sensores:
             f"Oleo={self.pressao_oleo:.1f} PSI"
         )
 
-    # ==========================================================
-    # LEITURA DOS SENSORES
-    # ==========================================================
-
     def ler_temperatura_camara(self):
-        """
-        Retorna a temperatura da camara.
-        """
         return self.temp_camara
 
     def ler_temperatura_evaporador(self):
-        """
-        Retorna a temperatura do evaporador.
-        """
         return self.temp_evaporador
 
     def ler_pressao_succao(self):
-        """
-        Retorna a pressao de succao.
-        """
         return self.pressao_succao
 
     def ler_pressao_descarga(self):
-        """
-        Retorna a pressao de descarga.
-        """
         return self.pressao_descarga
 
     def ler_pressao_oleo(self):
-        """
-        Retorna a pressao de oleo.
-        """
         return self.pressao_oleo
-
-    # ==========================================================
-    # STATUS
-    # ==========================================================
 
     def status(self):
         """

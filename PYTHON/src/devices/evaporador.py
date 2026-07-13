@@ -12,21 +12,15 @@
 #
 # DESCRICAO
 # --------------------------------------------------------------
-# Responsavel pelo controle do ventilador do evaporador.
+# Controla o ventilador do evaporador.
 #
-# Regras de funcionamento:
+# O ventilador liga somente quando:
 #
-# • Compressor ligado:
-#       Ventilador ligado.
+#   • Compressor ligado
+#   • Degelo desligado
 #
-# • Degelo ativo:
-#       Ventilador desligado.
-#
-# • Compressor desligado:
-#       Ventilador desligado.
-#
-# O ventilador nunca deve operar durante o degelo para evitar
-# que o calor seja distribuido para a camara.
+# A mensagem da saida somente e exibida quando ocorre
+# uma mudanca real de estado.
 # ==============================================================
 
 
@@ -35,20 +29,8 @@ class Evaporador:
     Controle do ventilador do evaporador.
     """
 
-    # ==========================================================
-    # INICIALIZACAO
-    # ==========================================================
-
     def __init__(self):
-        """
-        Inicializa o ventilador do evaporador.
-        """
-
         self.ligado = False
-
-    # ==========================================================
-    # CONTROLE DO VENTILADOR
-    # ==========================================================
 
     def controlar(
         self,
@@ -56,48 +38,21 @@ class Evaporador:
         degelo_ativo
     ):
         """
-        Controla o ventilador do evaporador.
-
-        Regras:
-
-            Compressor ON
-            Degelo OFF
-
-                -> Ventilador ON
-
-            Compressor OFF
-
-                -> Ventilador OFF
-
-            Degelo ON
-
-                -> Ventilador OFF
+        Atualiza o estado do ventilador.
         """
 
-        # ------------------------------------------------------
-        # REFRIGERACAO
-        # ------------------------------------------------------
+        estado_anterior = self.ligado
 
-        if compressor_ligado and not degelo_ativo:
-
-            self.ligado = True
-
-        # ------------------------------------------------------
-        # DEGELO OU COMPRESSOR DESLIGADO
-        # ------------------------------------------------------
-
-        else:
-
-            self.ligado = False
-
-        print(
-            "DO_VentiladorEvaporador = "
-            f"{'ON' if self.ligado else 'OFF'}"
+        self.ligado = (
+            compressor_ligado
+            and not degelo_ativo
         )
 
-    # ==========================================================
-    # STATUS
-    # ==========================================================
+        if estado_anterior != self.ligado:
+            print(
+                "DO_VentiladorEvaporador = "
+                f"{'ON' if self.ligado else 'OFF'}"
+            )
 
     def status(self):
         """
