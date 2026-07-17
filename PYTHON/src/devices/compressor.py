@@ -12,17 +12,17 @@
 #
 # DESCRICAO
 # --------------------------------------------------------------
-# Responsavel pelo controle do compressor da camara frigorifica.
+# Responsavel pelo controle do compressor da maquina frigorifica.
 #
-# Recursos:
+# Funcoes:
 #
-#   • Liga o compressor
-#   • Desliga o compressor
-#   • Controle de anti-rearme
-#   • Informa o estado atual
+#   - Ligar o compressor
+#   - Desligar o compressor
+#   - Controlar o tempo de anti-rearme
+#   - Informar o estado atual do compressor
 #
-# O anti-rearme protege o compressor contra partidas
-# consecutivas em um intervalo muito pequeno.
+# O anti-rearme impede uma nova partida logo apos o desligamento,
+# protegendo o compressor contra partidas consecutivas.
 # ==============================================================
 
 from config.machine_config import MachineConfig
@@ -31,19 +31,13 @@ from core.timer import Timer
 
 class Compressor:
     """
-    Classe responsavel pelo controle do compressor.
+    Controle da saida digital do compressor.
     """
-
-    # ==========================================================
-    # INICIALIZACAO
-    # ==========================================================
 
     def __init__(self):
         """
-        Inicializa o compressor.
-
-        O temporizador de anti-rearme e iniciado para impedir
-        partidas consecutivas logo apos o desligamento.
+        Inicializa o compressor desligado e inicia o temporizador
+        de anti-rearme.
         """
 
         self.ligado = False
@@ -51,48 +45,29 @@ class Compressor:
         self.timer_antirearme = Timer()
         self.timer_antirearme.iniciar()
 
-    # ==========================================================
-    # VERIFICACAO DO ANTI-REARME
-    # ==========================================================
-
     def pode_ligar(self):
         """
         Verifica se o tempo de anti-rearme foi cumprido.
 
-        Retorno:
-
-            True
-                Compressor liberado.
-
-            False
-                Compressor ainda bloqueado pelo temporizador.
+        Retorna:
+            True  - compressor liberado para partir.
+            False - compressor bloqueado pelo anti-rearme.
         """
+
+        if self.ligado:
+            return True
 
         return self.timer_antirearme.expirou(
             MachineConfig.ANTI_REARME_SEGUNDOS
         )
 
-    # ==========================================================
-    # LIGA COMPRESSOR
-    # ==========================================================
-
     def ligar(self):
         """
-        Liga o compressor.
+        Liga o compressor quando o anti-rearme estiver liberado.
 
-        Sequencia:
-
-            1. Verifica se ja esta ligado.
-            2. Verifica o anti-rearme.
-            3. Aciona a saida do compressor.
-
-        Retorno:
-
-            True
-                Compressor ligado.
-
-            False
-                Compressor bloqueado.
+        Retorna:
+            True  - compressor ligado ou ja estava ligado.
+            False - partida bloqueada pelo anti-rearme.
         """
 
         if self.ligado:
@@ -102,6 +77,7 @@ class Compressor:
             print(
                 "Compressor bloqueado pelo anti-rearme."
             )
+
             return False
 
         self.ligado = True
@@ -110,23 +86,41 @@ class Compressor:
 
         return True
 
-    # ==========================================================
-    # DESLIGA COMPRESSOR
-    # ==========================================================
-
     def desligar(self):
         """
         Desliga o compressor.
 
-        Ao desligar, o temporizador de anti-rearme e reiniciado,
-        impedindo uma nova partida imediata.
+        Quando ocorre o desligamento, o temporizador de
+        anti-rearme e reiniciado.
         """
 
         if not self.ligado:
-            return
+            return False
 
         self.ligado = False
 
         self.timer_antirearme.reiniciar()
 
         print("DO_Compressor = OFF")
+
+        return True
+
+    def esta_ligado(self):
+        """
+        Retorna o estado atual do compressor.
+        """
+
+        return self.ligado
+
+    def status(self):
+        """
+        Retorna as informacoes do compressor.
+        """
+
+        return {
+            "ligado": self.ligado,
+            "anti_rearme_liberado": self.pode_ligar(),
+            "tempo_anti_rearme": (
+                MachineConfig.ANTI_REARME_SEGUNDOS
+            ),
+        }

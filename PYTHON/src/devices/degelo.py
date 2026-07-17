@@ -8,22 +8,21 @@
 #
 # AUTOR   : Douglas Silva Florencio
 # DATA    : Julho/2026
-# VERSAO  : 1.0
+# VERSAO  : 1.1
 #
 # DESCRICAO
 # --------------------------------------------------------------
-# Responsavel pelo controle do ciclo de degelo por gas quente.
+# Controle do ciclo de degelo por gas quente.
 #
-# Recursos:
+# Funcoes:
 #
-# • Iniciar degelo
-# • Finalizar degelo
-# • Monitorar temperatura do evaporador
-# • Informar estado atual
+#   - Iniciar o degelo
+#   - Finalizar o degelo
+#   - Verificar temperatura de termino
+#   - Informar o estado atual
 #
-# O degelo e encerrado quando a temperatura configurada
-# do evaporador for atingida ou pelo tempo maximo
-# definido na maquina principal.
+# O tempo maximo do degelo e controlado pela Machine.
+# Esta classe controla apenas o estado do degelo.
 # ==============================================================
 
 from config.machine_config import MachineConfig
@@ -34,13 +33,9 @@ class Degelo:
     Controle do ciclo de degelo.
     """
 
-    # ==========================================================
-    # INICIALIZACAO
-    # ==========================================================
-
     def __init__(self):
         """
-        Inicializa o controlador de degelo.
+        Inicializa o controlador.
         """
 
         self.ativo = False
@@ -49,51 +44,41 @@ class Degelo:
             MachineConfig.TEMPERATURA_FIM_DEGELO
         )
 
-    # ==========================================================
-    # INICIAR DEGELO
-    # ==========================================================
-
     def iniciar(self):
         """
-        Ativa o ciclo de degelo.
+        Inicia o ciclo de degelo.
         """
+
+        if self.ativo:
+            return
 
         self.ativo = True
 
         print("DO_Degelo = ON")
-
-    # ==========================================================
-    # FINALIZAR DEGELO
-    # ==========================================================
 
     def finalizar(self):
         """
         Finaliza o ciclo de degelo.
         """
 
+        if not self.ativo:
+            return
+
         self.ativo = False
 
         print("DO_Degelo = OFF")
-
-    # ==========================================================
-    # VERIFICAR FINAL DO DEGELO
-    # ==========================================================
 
     def deve_finalizar(
         self,
         temperatura_evaporador
     ):
         """
-        Verifica se a temperatura final do evaporador
-        foi atingida.
+        Verifica se a temperatura de termino
+        do degelo foi atingida.
 
-        Retorno:
-
-            True
-                Degelo concluido.
-
-            False
-                Continuar degelo.
+        Retorna:
+            True  -> Finalizar degelo.
+            False -> Continuar degelo.
         """
 
         return (
@@ -101,13 +86,19 @@ class Degelo:
             >= self.temperatura_fim
         )
 
-    # ==========================================================
-    # STATUS
-    # ==========================================================
+    def em_degelo(self):
+        """
+        Retorna True quando o degelo estiver ativo.
+        """
+
+        return self.ativo
 
     def status(self):
         """
         Retorna o estado atual do degelo.
         """
 
-        return self.ativo
+        return {
+            "ativo": self.ativo,
+            "temperatura_final": self.temperatura_fim,
+        }

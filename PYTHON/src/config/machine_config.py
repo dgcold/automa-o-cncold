@@ -1,95 +1,64 @@
-# -*- coding: utf-8 -*-
-
-# ==============================================================
-# PROJETO : CN500_LT_IPRO
-# EMPRESA : CN Cold
-#
-# ARQUIVO : machine_config.py
-#
-# AUTOR   : Douglas Silva Florencio
-# DATA    : Julho/2026
-# VERSAO  : 1.0
-#
-# DESCRICAO
-# --------------------------------------------------------------
-# Parametros gerais da maquina frigorifica.
-#
-# Todas as configuracoes do sistema estao centralizadas neste
-# arquivo para facilitar futuras alteracoes.
-#
-# Parametros:
-#
-# • Temperatura
-# • Anti-rearme
-# • Degelo
-# • Gotejamento
-# • Valvula de expansao
-# • Condensacao
-# • Protecao de oleo
-# ==============================================================
-
-
 class MachineConfig:
 
     # ==========================================================
     # CONTROLE DE TEMPERATURA
     # ==========================================================
 
-    # Setpoint da camara (°C)
     SETPOINT = -18.0
-
-    # Diferencial de temperatura (°C)
     DIFERENCIAL = 2.0
 
     # ==========================================================
     # COMPRESSOR
     # ==========================================================
 
-    # Tempo minimo entre partidas (s)
     ANTI_REARME_SEGUNDOS = 5
+
+    # Pressao recomendada de trabalho.
+    # Acima deste valor a maquina continua funcionando,
+    # apenas perde rendimento.
+    PRESSAO_SUCCAO_REFERENCIA_PSI = 20.0
 
     # ==========================================================
     # DEGELO
     # ==========================================================
 
-    # Intervalo entre degelos (s)
+    # Intervalo entre degelos
     INTERVALO_DEGELO_SEGUNDOS = 60
 
-    # Tempo entre cada abertura da valvula (s)
-    PASSO_VALVULA_DEGELO_SEGUNDOS = 2
-
-    # Tempo maximo permitido para o degelo (s)
+    # Tempo maximo do degelo
     TEMPO_MAXIMO_DEGELO_SEGUNDOS = 60
 
-    # Tempo de gotejamento (s)
+    # Tempo do gotejamento
     TEMPO_GOTEJAMENTO_SEGUNDOS = 10
 
-    # ==========================================================
-    # VALVULA DE EXPANSAO
-    # ==========================================================
-
-    # Abertura inicial durante o degelo (%)
-    ABERTURA_INICIAL_DEGELO = 50
-
-    # Incremento da abertura (%)
-    INCREMENTO_VALVULA_DEGELO = 10
-
-    # Temperatura final do evaporador (°C)
+    # Temperatura para finalizar o degelo
     TEMPERATURA_FIM_DEGELO = 8.0
+
+    # Tempo entre cada atualizacao da simulacao do degelo
+    PASSO_SIMULACAO_DEGELO_SEGUNDOS = 2
+
+    # ==========================================================
+    # RETARDO DO VENTILADOR APOS DEGELO
+    # ==========================================================
+
+    # O ventilador do evaporador so sera liberado
+    # quando o evaporador estiver frio novamente.
+    TEMPERATURA_LIBERA_VENTILADOR = -5.0
+
+    # Tempo maximo de espera para liberar o ventilador,
+    # mesmo que a temperatura ainda nao tenha atingido
+    # o valor configurado.
+    TEMPO_MAXIMO_ESPERA_VENTILADOR_SEGUNDOS = 120
 
     # ==========================================================
     # CONDENSADOR
     # ==========================================================
 
-    # Liga Fan 2 (PSI)
     FAN2_ON_PSI = 270.0
-
-    # Desliga Fan 2 (PSI)
     FAN2_OFF_PSI = 240.0
 
     # ==========================================================
     # PROTECAO DE OLEO
     # ==========================================================
 
-    # Tempo maximo sem pressao de oleo (s)
     TEMPO_MAXIMO_OLEO_SEGUNDOS = 30

@@ -8,20 +8,29 @@
 #
 # AUTOR   : Douglas Silva Florencio
 # DATA    : Julho/2026
-# VERSAO  : 1.0
+# VERSAO  : 1.1
 #
 # DESCRICAO
 # --------------------------------------------------------------
-# Responsavel pelo controle da solenoide da linha de liquido.
+# Controle da valvula solenoide da linha de liquido.
 #
 # Funcao:
 #
-# • Liberar refrigerante para o evaporador.
-# • Interromper o fluxo durante a parada.
-# • Auxiliar na sequencia de refrigeracao.
+#   - Liberar refrigerante para o evaporador.
+#   - Interromper o fluxo durante a parada.
+#   - Auxiliar na sequencia de refrigeracao.
 #
-# A linha de liquido sempre deve ser aberta antes da partida
-# do compressor e fechada antes do desligamento.
+# Sequencia correta:
+#
+#   1 - Abrir linha de liquido.
+#   2 - Ligar compressor.
+#
+# Parada:
+#
+#   1 - Fechar linha de liquido.
+#   2 - Desligar compressor.
+#
+# Estrutura preparada para migracao ao ISaGRAF.
 # ==============================================================
 
 
@@ -30,64 +39,53 @@ class LinhaLiquida:
     Controle da valvula solenoide da linha de liquido.
     """
 
-    # ==========================================================
-    # INICIALIZACAO
-    # ==========================================================
-
     def __init__(self):
         """
-        Inicializa a linha de liquido.
+        Inicializa a valvula fechada.
         """
 
         self.ligada = False
 
-    # ==========================================================
-    # LIGAR
-    # ==========================================================
-
     def ligar(self):
         """
-        Liga a linha de liquido.
-
-        Permite a passagem do refrigerante para o evaporador.
+        Abre a valvula da linha de liquido.
         """
 
         if self.ligada:
-            return
+            return True
 
         self.ligada = True
 
         print("DO_LinhaLiquida = ON")
 
-    # ==========================================================
-    # DESLIGAR
-    # ==========================================================
+        return True
 
     def desligar(self):
         """
-        Desliga a linha de liquido.
-
-        Interrompe o fluxo de refrigerante.
+        Fecha a valvula da linha de liquido.
         """
 
         if not self.ligada:
-            return
+            return False
 
         self.ligada = False
 
         print("DO_LinhaLiquida = OFF")
 
-    # ==========================================================
-    # STATUS
-    # ==========================================================
+        return True
 
-    def status(self):
+    def esta_ligada(self):
         """
-        Retorna o estado atual da linha de liquido.
-
-        True  -> Ligada
-
-        False -> Desligada
+        Retorna o estado atual da valvula.
         """
 
         return self.ligada
+
+    def status(self):
+        """
+        Retorna as informacoes da linha de liquido.
+        """
+
+        return {
+            "ligada": self.ligada
+        }

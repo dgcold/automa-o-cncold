@@ -8,20 +8,21 @@
 #
 # AUTOR   : Douglas Silva Florencio
 # DATA    : Julho/2026
-# VERSAO  : 1.0
+# VERSAO  : 1.1
 #
 # DESCRICAO
 # --------------------------------------------------------------
-# Controla os dois ventiladores do condensador.
+# Controle dos ventiladores do condensador.
 #
-# Fan 1:
-#   Ligado enquanto o compressor estiver ligado.
+# FAN 1
+#   - Liga junto com o compressor.
+#   - Desliga quando o compressor desliga.
 #
-# Fan 2:
-#   Controlado pela pressao de descarga com histerese.
+# FAN 2
+#   - Controlado pela pressao de descarga.
+#   - Utiliza histerese para evitar chaveamentos.
 #
-# As mensagens sao exibidas somente quando ocorre mudanca
-# real nas saidas.
+# Esta estrutura sera utilizada futuramente no ISaGRAF.
 # ==============================================================
 
 from controllers.condensacao import CondensacaoController
@@ -33,6 +34,7 @@ class Condensador:
     """
 
     def __init__(self):
+
         self.ventilador_1 = False
         self.ventilador_2 = False
 
@@ -44,46 +46,75 @@ class Condensador:
         pressao_descarga
     ):
         """
-        Atualiza os ventiladores conforme o compressor
-        e a pressao de descarga.
+        Atualiza o estado dos ventiladores.
         """
 
-        estado_anterior_fan1 = self.ventilador_1
-        estado_anterior_fan2 = self.ventilador_2
+        fan1_anterior = self.ventilador_1
+        fan2_anterior = self.ventilador_2
 
+        # Compressor desligado
         if not compressor_ligado:
+
             self.ventilador_1 = False
             self.ventilador_2 = False
 
             self.controle.resetar()
 
+        # Compressor ligado
         else:
+
+            # Fan 1 permanece ligado enquanto houver refrigeracao
             self.ventilador_1 = True
 
+            # Fan 2 depende da pressao de descarga
             self.ventilador_2 = (
                 self.controle.segundo_ventilador(
                     pressao_descarga
                 )
             )
 
-        if estado_anterior_fan1 != self.ventilador_1:
+        # Atualiza somente quando houver mudanca
+        if fan1_anterior != self.ventilador_1:
+
             print(
                 "DO_VentiladorCondensador_1 = "
                 f"{'ON' if self.ventilador_1 else 'OFF'}"
             )
 
-        if estado_anterior_fan2 != self.ventilador_2:
+        if fan2_anterior != self.ventilador_2:
+
             print(
                 "DO_VentiladorCondensador_2 = "
                 f"{'ON' if self.ventilador_2 else 'OFF'}"
             )
 
+    def desligar(self):
+        """
+        Desliga completamente o condensador.
+        """
+
+        self.controlar(False, 0.0)
+
+    def fan1_ligado(self):
+        """
+        Retorna o estado do ventilador 1.
+        """
+
+        return self.ventilador_1
+
+    def fan2_ligado(self):
+        """
+        Retorna o estado do ventilador 2.
+        """
+
+        return self.ventilador_2
+
     def status(self):
         """
-        Retorna o estado atual dos ventiladores.
+        Retorna o estado dos ventiladores.
         """
 
         return {
-            "Fan1": self.ventilador_1,
-            "Fan2": self.ventilador_2,
+            "ventilador_1": self.ventilador_1,
+            "ventilador_2": self.ventilador_2,
         }
