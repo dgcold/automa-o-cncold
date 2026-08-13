@@ -1,0 +1,99 @@
+INTERVALO_ATUALIZACAO = 1.0
+
+# =========================
+# VALORES INICIAIS
+# =========================
+
+TEMP_CAMARA_INICIAL = 20.0
+TEMP_EVAPORADOR_INICIAL = 15.0
+
+PRESSAO_SUCCAO_INICIAL = 90.0
+PRESSAO_DESCARGA_INICIAL = 100.0
+PRESSAO_OLEO_INICIAL = 90.0
+
+AGRESSIVIDADE_INICIAL = 20
+
+
+# =========================
+# COMPORTAMENTO DA CÂMARA
+# =========================
+
+# Compressor ligado:
+# queda de 0,5 °C a cada 70 segundos
+QUEDA_CAMARA_GRAUS = 0.5
+QUEDA_CAMARA_SEGUNDOS = 70.0
+
+# Compressor desligado:
+# subida de 0,5 °C a cada 60 segundos
+SUBIDA_CAMARA_GRAUS = 0.5
+SUBIDA_CAMARA_SEGUNDOS = 60.0
+
+
+# =========================
+# ALVOS COM COMPRESSOR LIGADO
+# =========================
+
+TEMP_DIFERENCA_EVAPORADOR = 8.0
+
+PRESSAO_SUCCAO_ALVO = 18.0
+PRESSAO_DESCARGA_ALVO = 260.0
+DIFERENCIAL_OLEO_ALVO = 42.0
+
+
+# =========================
+# ALVOS COM COMPRESSOR DESLIGADO
+# =========================
+
+PRESSAO_EQUALIZACAO = 110.0
+
+
+# =========================
+# COMPORTAMENTO DO DEGELO
+# =========================
+
+SUBIDA_EVAPORADOR_DEGELO_POR_SEGUNDO = 0.08
+SUBIDA_CAMARA_DEGELO_POR_SEGUNDO = 0.002
+
+PRESSAO_SUCCAO_DEGELO_ALVO = 70.0
+PRESSAO_DESCARGA_DEGELO_ALVO = 150.0
+
+
+# =========================
+# LIMITES DA SIMULAÇÃO
+# =========================
+
+TEMP_CAMARA_MIN = -40.0
+TEMP_CAMARA_MAX = 50.0
+
+TEMP_EVAPORADOR_MIN = -50.0
+TEMP_EVAPORADOR_MAX = 60.0
+
+PRESSAO_SUCCAO_MIN = 0.0
+PRESSAO_SUCCAO_MAX = 150.0
+
+PRESSAO_DESCARGA_MIN = 0.0
+PRESSAO_DESCARGA_MAX = 500.0
+
+PRESSAO_OLEO_MIN = 0.0
+PRESSAO_OLEO_MAX = 200.0
+
+AGRESSIVIDADE_MIN = 0
+AGRESSIVIDADE_MAX = 100
+PASSO_AGRESSIVIDADE = 10
+
+
+# =========================
+# HISTÓRICO
+# =========================
+
+INTERVALO_REGISTRO_HISTORICO = 5.0
+
+
+# =========================
+# CONTROLE AUTOMÁTICO
+# =========================
+
+MODO_AUTOMATICO = True
+
+SETPOINT_CAMARA = -18.0
+DIFERENCIAL_CAMARA = 2.0

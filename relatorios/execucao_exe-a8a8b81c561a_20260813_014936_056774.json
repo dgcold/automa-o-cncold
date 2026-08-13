@@ -1,0 +1,36 @@
+[
+  {
+    "scenario": "TESTE 04 - VENTILADOR CONDENSADOR FALHA",
+    "scenario_id": "CEN-898FD1F4",
+    "execution_id": "EXE-A8A8B81C561A",
+    "session_id": "DIA-9C29BDB7306B",
+    "seed": 1,
+    "duration": 240.0,
+    "speed": 100,
+    "samples": 768,
+    "faults": [
+      {
+        "name": "VENTILADOR_CONDENSADOR_FALHA",
+        "timestamp": "2026-01-01T00:02:10+00:00"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-01-01T00:02:10+00:00",
+        "event": "FALHA_INJETADA:VENTILADOR_CONDENSADOR_FALHA"
+      }
+    ],
+    "first_deviation": null,
+    "criteria": [
+      {
+        "criterion": "Sem desvio de compressor",
+        "outcome": "PASSOU",
+        "detail": "evento COMPRESSOR_COMANDADO_SEM_RESPOSTA: 0 ocorrência(s)"
+      }
+    ],
+    "technical_result": "PASSOU",
+    "diagnosis": "NÃO DETERMINADO",
+    "anomaly": "NÃO DETERMINADO",
+    "health": "NÃO DETERMINADO"
+  }
+]

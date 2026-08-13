@@ -1,0 +1,9 @@
+{
+  "metadata": {
+    "controller_id": "fullgauge_vx1050e",
+    "kind": "OFFICIAL",
+    "status": "AGUARDANDO MAPA MODBUS OFICIAL",
+    "notes": "Nenhum registrador, função, escala, unidade ou endereço foi presumido."
+  },
+  "variables": []
+}

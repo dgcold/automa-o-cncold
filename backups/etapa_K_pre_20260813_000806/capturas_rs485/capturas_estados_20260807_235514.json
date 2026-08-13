@@ -1,0 +1,396 @@
+{
+  "A": [
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 10,
+      "valores": [
+        200,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 20,
+      "valores": [
+        65316,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 34,
+      "valores": [
+        180,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 42,
+      "valores": [
+        260,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 50,
+      "valores": [
+        450,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 58,
+      "valores": [
+        100,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 200,
+      "valores": [
+        300,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 1200,
+      "valores": [
+        400,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 1208,
+      "valores": [
+        500,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 1216,
+      "valores": [
+        600,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 2,
+      "funcao": 3,
+      "endereco": 256,
+      "valores": [
+        100,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 2,
+      "funcao": 3,
+      "endereco": 261,
+      "valores": [
+        200
+      ]
+    },
+    {
+      "slave": 2,
+      "funcao": 3,
+      "endereco": 263,
+      "valores": [
+        300,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 2,
+      "funcao": 3,
+      "endereco": 272,
+      "valores": [
+        400,
+        0
+      ]
+    },
+    {
+      "slave": 2,
+      "funcao": 3,
+      "endereco": 3328,
+      "valores": [
+        500
+      ]
+    }
+  ],
+  "B": [
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 10,
+      "valores": [
+        65236,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 20,
+      "valores": [
+        65316,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 34,
+      "valores": [
+        180,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 42,
+      "valores": [
+        260,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 50,
+      "valores": [
+        450,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 58,
+      "valores": [
+        100,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 200,
+      "valores": [
+        300,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 1200,
+      "valores": [
+        400,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 1208,
+      "valores": [
+        500,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 1,
+      "funcao": 4,
+      "endereco": 1216,
+      "valores": [
+        600,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 2,
+      "funcao": 3,
+      "endereco": 256,
+      "valores": [
+        100,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 2,
+      "funcao": 3,
+      "endereco": 261,
+      "valores": [
+        200
+      ]
+    },
+    {
+      "slave": 2,
+      "funcao": 3,
+      "endereco": 263,
+      "valores": [
+        300,
+        0,
+        0
+      ]
+    },
+    {
+      "slave": 2,
+      "funcao": 3,
+      "endereco": 272,
+      "valores": [
+        400,
+        0
+      ]
+    },
+    {
+      "slave": 2,
+      "funcao": 3,
+      "endereco": 3328,
+      "valores": [
+        500
+      ]
+    }
+  ]
+}

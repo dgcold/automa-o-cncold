@@ -1,0 +1,10 @@
+{
+  "instrument_id": "em210_total",
+  "manufacturer": "Carlo Gavazzi",
+  "model": "EM210",
+  "role": "TOTAL DA MÁQUINA",
+  "mode": "SOMENTE LEITURA",
+  "transport": null,
+  "automatic_connection": false,
+  "status": "AGUARDANDO DRIVER/MAPA OFICIAL"
+}

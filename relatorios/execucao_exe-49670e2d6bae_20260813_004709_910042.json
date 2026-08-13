@@ -1,0 +1,26 @@
+[
+  {
+    "scenario": "TESTE 02 - OPERAÇÃO NORMAL",
+    "scenario_id": "CEN-BFEA2FD1",
+    "execution_id": "EXE-49670E2D6BAE",
+    "session_id": "DIA-14717A267A67",
+    "seed": 1,
+    "duration": 240.0,
+    "speed": 100,
+    "samples": 768,
+    "faults": [],
+    "events": [],
+    "first_deviation": null,
+    "criteria": [
+      {
+        "criterion": "Sem desvio de compressor",
+        "outcome": "PASSOU",
+        "detail": "evento COMPRESSOR_COMANDADO_SEM_RESPOSTA: 0 ocorrência(s)"
+      }
+    ],
+    "technical_result": "PASSOU",
+    "diagnosis": "NÃO DETERMINADO",
+    "anomaly": "NÃO DETERMINADO",
+    "health": "NÃO DETERMINADO"
+  }
+]

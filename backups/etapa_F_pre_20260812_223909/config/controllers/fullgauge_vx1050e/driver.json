@@ -1,0 +1,14 @@
+{
+  "controller_id": "fullgauge_vx1050e",
+  "manufacturer": "Full Gauge Controls",
+  "model": "VX-1050E",
+  "mode": "SOMENTE LEITURA",
+  "allowed_functions": [],
+  "transport": {
+    "type": null,
+    "activation": "BLOQUEADA ATÉ DOCUMENTAÇÃO OFICIAL",
+    "automatic_connection": false
+  },
+  "official_map": "official_map.json",
+  "candidate_map": null
+}

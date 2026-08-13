@@ -1,0 +1,1 @@
+{"evento": "teste_conexao", "registrado_em": "2026-08-08T01:59:59.307492-03:00", "timestamp": "2026-08-08T01:59:59.306483-03:00", "endpoint": "tcp://192.168.0.250:502", "status": "ERRO", "latencia_ms": 1021.255, "erro_tipo": "TimeoutError", "erro": "TimeoutError('timed out')"}

@@ -1,0 +1,61 @@
+[
+  {
+    "scenario": "TESTE 07 - DEGELO INCOMPLETO",
+    "scenario_id": "CEN-ACE657BB",
+    "execution_id": "EXE-BFCFF6663361",
+    "session_id": "DIA-9A50C74283C8",
+    "seed": 1,
+    "duration": 700.0,
+    "speed": 100,
+    "samples": 2240,
+    "faults": [
+      {
+        "name": "DEGELO_INCOMPLETO",
+        "timestamp": "2026-01-01T00:06:55+00:00"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-01-01T00:05:00+00:00",
+        "event": "DEGELO_INICIO"
+      },
+      {
+        "timestamp": "2026-01-01T00:06:00+00:00",
+        "event": "DEGELO_FIM"
+      },
+      {
+        "timestamp": "2026-01-01T00:06:30+00:00",
+        "event": "GOTEJAMENTO_FIM"
+      },
+      {
+        "timestamp": "2026-01-01T00:06:40+00:00",
+        "event": "RETORNO_REFRIGERACAO"
+      },
+      {
+        "timestamp": "2026-01-01T00:06:50+00:00",
+        "event": "COMANDO_COMPRESSOR"
+      },
+      {
+        "timestamp": "2026-01-01T00:06:55+00:00",
+        "event": "FALHA_INJETADA:DEGELO_INCOMPLETO"
+      }
+    ],
+    "first_deviation": null,
+    "criteria": [
+      {
+        "criterion": "Sem desvio de compressor",
+        "outcome": "PASSOU",
+        "detail": "evento COMPRESSOR_COMANDADO_SEM_RESPOSTA: 0 ocorrência(s)"
+      },
+      {
+        "criterion": "Recuperação após degelo",
+        "outcome": "FALHOU",
+        "detail": "evento RECUPERACAO: 0 ocorrência(s)"
+      }
+    ],
+    "technical_result": "FALHOU",
+    "diagnosis": "NÃO DETERMINADO",
+    "anomaly": "NÃO DETERMINADO",
+    "health": "NÃO DETERMINADO"
+  }
+]

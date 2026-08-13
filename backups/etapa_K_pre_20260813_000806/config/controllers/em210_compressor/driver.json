@@ -1,0 +1,10 @@
+{
+  "instrument_id": "em210_compressor",
+  "manufacturer": "Carlo Gavazzi",
+  "model": "EM210",
+  "role": "COMPRESSOR",
+  "mode": "SOMENTE LEITURA",
+  "transport": null,
+  "automatic_connection": false,
+  "status": "AGUARDANDO DRIVER/MAPA OFICIAL"
+}

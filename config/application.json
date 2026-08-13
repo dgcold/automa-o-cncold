@@ -1,0 +1,28 @@
+{
+  "application": {
+    "name": "CNCold Industrial Diagnostics",
+    "version": "1.0.0",
+    "default_mode": "SIMULADOR"
+  },
+  "ipro": {
+    "host": "192.168.0.250",
+    "port": 502,
+    "unit_id": 1,
+    "timeout_seconds": 2.0,
+    "allowed_functions": [3, 4],
+    "automatic_connection": false
+  },
+  "rs485_simulator": {
+    "port": "COM8",
+    "baudrate": 9600,
+    "bytesize": 8,
+    "parity": "N",
+    "stopbits": 2,
+    "automatic_start": false
+  },
+  "analysis": {
+    "history_page_limit": 250,
+    "export_limit": 1000,
+    "timeline_limit": 5000
+  }
+}

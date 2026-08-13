@@ -1,0 +1,1 @@
+{"evento": "teste_conexao", "registrado_em": "2026-08-08T01:44:55.076309-03:00", "timestamp": "2026-08-08T01:44:55.075313-03:00", "endpoint": "tcp://192.168.0.250:502", "status": "CONECTADO", "latencia_ms": 7.565, "erro_tipo": null, "erro": null}

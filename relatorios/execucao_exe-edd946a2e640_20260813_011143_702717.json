@@ -1,0 +1,36 @@
+[
+  {
+    "scenario": "TESTE 10 - DESEQUILÍBRIO DE FASES",
+    "scenario_id": "CEN-CA5A6449",
+    "execution_id": "EXE-EDD946A2E640",
+    "session_id": "DIA-B1BF9680CC1F",
+    "seed": 1,
+    "duration": 240.0,
+    "speed": 100,
+    "samples": 768,
+    "faults": [
+      {
+        "name": "DESEQUILIBRIO_FASES",
+        "timestamp": "2026-01-01T00:02:10+00:00"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-01-01T00:02:10+00:00",
+        "event": "FALHA_INJETADA:DESEQUILIBRIO_FASES"
+      }
+    ],
+    "first_deviation": null,
+    "criteria": [
+      {
+        "criterion": "Sem desvio de compressor",
+        "outcome": "PASSOU",
+        "detail": "evento COMPRESSOR_COMANDADO_SEM_RESPOSTA: 0 ocorrência(s)"
+      }
+    ],
+    "technical_result": "PASSOU",
+    "diagnosis": "NÃO DETERMINADO",
+    "anomaly": "NÃO DETERMINADO",
+    "health": "NÃO DETERMINADO"
+  }
+]

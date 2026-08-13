@@ -1,0 +1,2 @@
+Arquivo organizado para substituir o gerador_sinais.py do projeto.
+Este ZIP contém o arquivo renomeado e pronto para ser copiado para o projeto.

@@ -1,0 +1,22 @@
+W1;variavel;valor_ipro;fc;endereco;valor_bruto;escala;confianca;evidencia
+0;Temperatura Ambiente;32767;03/04;384;32767;÷10 °C;PROVÁVEL;Início 384 reproduz W1[0..7] exatamente e o par 384/385 reproduz valor/flag
+2;Umidade Ambiente;32767;03/04;386;32767;÷10 %;PROVÁVEL;Sequência 384..391 igual a W1[0..7]
+4;Temperatura de Degelo;32767;03/04;388;32767;÷10 °C;PROVÁVEL;Sequência 384..391 igual a W1[0..7] e par 388/389 valor/flag
+6;Temperatura Externa;32767;03/04;390;32767;÷10 °C;PROVÁVEL;Sequência 384..391 igual a W1[0..7] e par 390/391 valor/flag
+8;Temperatura de Descarga;32767;03/04;404;32767;÷10 °C;PROVÁVEL;Par 404/405 reproduz W1[8]/W1[9] e coincide com mapa provisório anterior
+10;Pressão de Descarga;32767;03/04;394;32767;÷10 bar;PROVÁVEL;Par 394/395 reproduz W1[10]/W1[11] e coincide com mapa provisório anterior
+12;Temperatura de Condensação;32767;03/04;406;32767;÷10 °C;CANDIDATO;Valor atual e endereço do mapa provisório coincidem; falta variação dinâmica
+13;Pressão de Sucção;32767;03/04;396;32767;÷10 bar;PROVÁVEL;Par 396/397 reproduz W1[13]/W1[14] e coincide com mapa provisório anterior
+15;Temperatura de Insuflamento;32767;03/04;392;32767;÷10 °C;PROVÁVEL;Par 392/393 reproduz W1[15]/W1[16] e coincide com mapa provisório anterior
+17;Temperatura de Sucção;32767;03/04;398;32767;÷10 °C;PROVÁVEL;Par 398/399 reproduz W1[17]/W1[18] e coincide com mapa provisório anterior
+19;Temperatura de Líquido;32767;03/04;400;32767;÷10 °C;PROVÁVEL;Par 400/401 reproduz W1[19]/W1[20] e coincide com mapa provisório anterior
+23;Temperatura de Evaporação;32767;03/04;407;32767;÷10 °C;CANDIDATO;Valor atual e endereço do mapa provisório coincidem; falta variação dinâmica
+24;Superaquecimento;0;03/04;408;0;÷10 K;CANDIDATO;Valor atual e endereço do mapa provisório coincidem; zero não é discriminante
+25;Sub-resfriamento;32767;03/04;409;32767;÷10 K;CANDIDATO;Valor atual e endereço do mapa provisório coincidem; falta variação dinâmica
+26;Setpoint de Temperatura;-250;03/04;4880;65286;÷10 °C;PROVÁVEL;Valor -250 é distintivo e foi reproduzido nas duas funções
+39;Status Unidade;0;03/04;4096;0;estado;CANDIDATO;Coincide com mapa provisório e W1 atual; zero isolado é pouco discriminante
+41;Status Evaporador;-1;03/04;5632;65535;enum;PROVÁVEL;Sequência 5632..5634 reproduz W1[41..43] exatamente nas duas funções
+42;Horas Evaporador;40;03/04;5633;40;horas;PROVÁVEL;Sequência 5632..5634 reproduz W1[41..43] exatamente nas duas funções
+44;Status Compressor;-1;03/04;4864;65535;enum;PROVÁVEL;Bloco lógico 4864..4867 reproduz status/horas/capacidade do compressor
+45;Horas Compressor;19;03/04;4866;19;horas;PROVÁVEL;Valor e posição no bloco lógico do compressor reproduzidos nas duas funções
+47;Capacidade Compressor;40;03/04;4867;40;%;PROVÁVEL;Valor e posição no bloco lógico do compressor reproduzidos nas duas funções

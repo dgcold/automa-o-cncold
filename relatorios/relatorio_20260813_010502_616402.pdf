@@ -1,0 +1,130 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 5747 >>
+stream
+BT
+/F1 10 Tf
+48 790 Td
+(CNCold Industrial Diagnostics) Tj
+0 -15 Td
+(2026-08-13T01:05:02.611834-03:00) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(id: 2009 | timestamp: 2026-01-01T00:06:30+00:00 | channel_id: defrost | name: Degelo | group_name: I/O | value) Tj
+0 -15 Td
+(id: 2010 | timestamp: 2026-01-01T00:06:30+00:00 | channel_id: dripping | name: Gotejamento | group_name: I/O |) Tj
+0 -15 Td
+(id: 2011 | timestamp: 2026-01-01T00:06:30+00:00 | channel_id: communication | name: Comunicação simulada | gro) Tj
+0 -15 Td
+(id: 2012 | timestamp: 2026-01-01T00:06:30+00:00 | channel_id: current_total | name: Corrente total da máquina ) Tj
+0 -15 Td
+(id: 2013 | timestamp: 2026-01-01T00:06:30+00:00 | channel_id: current_compressor | name: Corrente do compresso) Tj
+0 -15 Td
+(id: 2014 | timestamp: 2026-01-01T00:06:30+00:00 | channel_id: current_l1 | name: Corrente L1 | group_name: MED) Tj
+0 -15 Td
+(id: 2015 | timestamp: 2026-01-01T00:06:30+00:00 | channel_id: current_l2 | name: Corrente L2 | group_name: MED) Tj
+0 -15 Td
+(id: 2016 | timestamp: 2026-01-01T00:06:30+00:00 | channel_id: current_l3 | name: Corrente L3 | group_name: MED) Tj
+0 -15 Td
+(id: 2017 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: temperature_chamber | name: Temperatura da câmar) Tj
+0 -15 Td
+(id: 2018 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: temperature_evaporator | name: Temperatura do ev) Tj
+0 -15 Td
+(id: 2019 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: pressure_suction | name: Pressão de sucção | gro) Tj
+0 -15 Td
+(id: 2020 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: pressure_discharge | name: Pressão de descarga |) Tj
+0 -15 Td
+(id: 2021 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: compressor_command | name: Comando do compressor) Tj
+0 -15 Td
+(id: 2022 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: compressor | name: Estado do compressor | group_) Tj
+0 -15 Td
+(id: 2023 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: evaporator_fan | name: Ventilador evaporador | g) Tj
+0 -15 Td
+(id: 2024 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: condenser_fan | name: Ventilador condensador | g) Tj
+0 -15 Td
+(id: 2025 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: defrost | name: Degelo | group_name: I/O | value) Tj
+0 -15 Td
+(id: 2026 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: dripping | name: Gotejamento | group_name: I/O |) Tj
+0 -15 Td
+(id: 2027 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: communication | name: Comunicação simulada | gro) Tj
+0 -15 Td
+(id: 2028 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: current_total | name: Corrente total da máquina ) Tj
+0 -15 Td
+(id: 2029 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: current_compressor | name: Corrente do compresso) Tj
+0 -15 Td
+(id: 2030 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: current_l1 | name: Corrente L1 | group_name: MED) Tj
+0 -15 Td
+(id: 2031 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: current_l2 | name: Corrente L2 | group_name: MED) Tj
+0 -15 Td
+(id: 2032 | timestamp: 2026-01-01T00:06:35+00:00 | channel_id: current_l3 | name: Corrente L3 | group_name: MED) Tj
+0 -15 Td
+(id: 2033 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: temperature_chamber | name: Temperatura da câmar) Tj
+0 -15 Td
+(id: 2034 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: temperature_evaporator | name: Temperatura do ev) Tj
+0 -15 Td
+(id: 2035 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: pressure_suction | name: Pressão de sucção | gro) Tj
+0 -15 Td
+(id: 2036 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: pressure_discharge | name: Pressão de descarga |) Tj
+0 -15 Td
+(id: 2037 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: compressor_command | name: Comando do compressor) Tj
+0 -15 Td
+(id: 2038 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: compressor | name: Estado do compressor | group_) Tj
+0 -15 Td
+(id: 2039 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: evaporator_fan | name: Ventilador evaporador | g) Tj
+0 -15 Td
+(id: 2040 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: condenser_fan | name: Ventilador condensador | g) Tj
+0 -15 Td
+(id: 2041 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: defrost | name: Degelo | group_name: I/O | value) Tj
+0 -15 Td
+(id: 2042 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: dripping | name: Gotejamento | group_name: I/O |) Tj
+0 -15 Td
+(id: 2043 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: communication | name: Comunicação simulada | gro) Tj
+0 -15 Td
+(id: 2044 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: current_total | name: Corrente total da máquina ) Tj
+0 -15 Td
+(id: 2045 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: current_compressor | name: Corrente do compresso) Tj
+0 -15 Td
+(id: 2046 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: current_l1 | name: Corrente L1 | group_name: MED) Tj
+0 -15 Td
+(id: 2047 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: current_l2 | name: Corrente L2 | group_name: MED) Tj
+0 -15 Td
+(id: 2048 | timestamp: 2026-01-01T00:06:40+00:00 | channel_id: current_l3 | name: Corrente L3 | group_name: MED) Tj
+0 -15 Td
+(id: 2049 | timestamp: 2026-01-01T00:06:45+00:00 | channel_id: temperature_chamber | name: Temperatura da câmar) Tj
+0 -15 Td
+(id: 2050 | timestamp: 2026-01-01T00:06:45+00:00 | channel_id: temperature_evaporator | name: Temperatura do ev) Tj
+0 -15 Td
+(id: 2051 | timestamp: 2026-01-01T00:06:45+00:00 | channel_id: pressure_suction | name: Pressão de sucção | gro) Tj
+0 -15 Td
+(id: 2052 | timestamp: 2026-01-01T00:06:45+00:00 | channel_id: pressure_discharge | name: Pressão de descarga |) Tj
+0 -15 Td
+(id: 2053 | timestamp: 2026-01-01T00:06:45+00:00 | channel_id: compressor_command | name: Comando do compressor) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000247 00000 n 
+0000006046 00000 n 
+trailer << /Size 6 /Root 1 0 R >>
+startxref
+6116
+%%EOF

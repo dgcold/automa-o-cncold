@@ -1,0 +1,26 @@
+﻿[
+    {
+        "Path":  "C:\\Users\\dougl\\Downloads\\CNCold_Digital_Twin_iPro_Mapa_Visivel\\CNCold Digital Twin iPro\\interface_qt_final_com_modbus.py",
+        "Hash":  "E9D2BEE73C28EA96788A29463C7C94EF1349E7B160199440782CA6C5BB9599CE"
+    },
+    {
+        "Path":  "C:\\Users\\dougl\\Downloads\\CNCold_Digital_Twin_iPro_Mapa_Visivel\\CNCold Digital Twin iPro\\leitor_ipro_tcp.py",
+        "Hash":  "145A18B46FC3D6A4F1E5912F45C9D7972BA46A373EFA6D66A13359A39DA51747"
+    },
+    {
+        "Path":  "C:\\Users\\dougl\\Downloads\\CNCold_Digital_Twin_iPro_Mapa_Visivel\\CNCold Digital Twin iPro\\simulador_ipro_rs485.py",
+        "Hash":  "CCC117F42BB7C0E72B546DE5F51069BD22367A967D59D81751F5E416D005EBBC"
+    },
+    {
+        "Path":  "C:\\Users\\dougl\\Downloads\\CNCold_Digital_Twin_iPro_Mapa_Visivel\\CNCold Digital Twin iPro\\config_simulador_ipro.json",
+        "Hash":  "AD3338FD5D79D38D93336F8DCF860759B549391C5F82166BA2DA69B604771413"
+    },
+    {
+        "Path":  "C:\\Users\\dougl\\Downloads\\CNCold_Digital_Twin_iPro_Mapa_Visivel\\CNCold Digital Twin iPro\\ARQUITETURA_BANCADA_IPRO.md",
+        "Hash":  "CB40A88C094047CC815E864DD728DA25992AEA1BBDE5DF0F1429B58D6059B52E"
+    },
+    {
+        "Path":  "C:\\Users\\dougl\\Downloads\\CNCold_Digital_Twin_iPro_Mapa_Visivel\\CNCold Digital Twin iPro\\MATRIZ_COMPLETA_BANCADA_IPRO.md",
+        "Hash":  "DABE058FB66222EC9F3A7E4D4F774DACC1F7911634F2A15B8BB421130DA65EF7"
+    }
+]

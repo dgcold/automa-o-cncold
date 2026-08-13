@@ -1,0 +1,13 @@
+VERSÃO COM MAPA IPRO VISÍVEL
+
+Abra a aba "iPro" na área INFORMAÇÕES.
+Ela exibe todas as variáveis principais já mapeadas:
+- temperaturas
+- pressões
+- superaquecimento e sub-resfriamento
+- abertura da válvula
+- capacidades
+- estados do compressor, evaporador, condensadores, degelo e solenóide
+
+No modo SIMULADO os valores são simulados.
+No modo REAL os valores vêm dos registradores definidos em ipro_map.py.

@@ -1,0 +1,247 @@
+﻿[
+    {
+        "path":  "config\\modbus_map.json",
+        "sha256":  "90759c18dafe76c29f924caa082a7e3a066dee6bf6c522c357279e878a8d8276",
+        "bytes":  5359
+    },
+    {
+        "path":  "ipro_bench\\communication.py",
+        "sha256":  "b7ebc2968d3ad6a695dc10bdef729c856eaf1ebf13578aa4a508dcde52b0bb4f",
+        "bytes":  1262
+    },
+    {
+        "path":  "ipro_bench\\core.py",
+        "sha256":  "5e46526a9ad8a8c9703a2342366de69554f64f163c548dadb885b2ff038de183",
+        "bytes":  1401
+    },
+    {
+        "path":  "ipro_bench\\evidence.py",
+        "sha256":  "688bfe478b68a1c53fc656403557341973ed6e3c766df2ac617dc3de056c9668",
+        "bytes":  1553
+    },
+    {
+        "path":  "ipro_bench\\mapping.py",
+        "sha256":  "a2564968f7f56c81142a15dbef92bed948346b78941126ca4eaad1d82506c142",
+        "bytes":  3651
+    },
+    {
+        "path":  "ipro_bench\\test_manager.py",
+        "sha256":  "0f125b4f29f07ce8aeb3e5cbdde7a076998a63afe3a258e69a6c9a8f5d85af77",
+        "bytes":  1911
+    },
+    {
+        "path":  "ipro_bench\\ui.py",
+        "sha256":  "96c6499bcf376a4a27e8960b7adc83bbd5ef819828aaa9e88a15ddfd9bab79c2",
+        "bytes":  19819
+    },
+    {
+        "path":  "ipro_bench\\__init__.py",
+        "sha256":  "de76d20c00e5cd54324e34913e2f05e2cde1b6654f47b986e24c82426c19313f",
+        "bytes":  93
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\communication.cpython-314.pyc",
+        "sha256":  "fefe516742c738c065c4fd645f1e87d107e47c4b011d92d9eb7b17fce950f962",
+        "bytes":  3979
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\core.cpython-312.pyc",
+        "sha256":  "2b85df028d6a2b4364c5ee53e0f17a5f0cc7010667edf9e812d62672cda382e2",
+        "bytes":  3074
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\core.cpython-314.pyc",
+        "sha256":  "36b1666f6a6d602c51a3c3ceabf80efa514eafc572db49571b9573d0eacf68b6",
+        "bytes":  3428
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\evidence.cpython-312.pyc",
+        "sha256":  "89693d649aa4b9c5c09479ce976710f972026d2d0059027739fd310e45345b29",
+        "bytes":  3162
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\evidence.cpython-314.pyc",
+        "sha256":  "63d069eedc98003dad04aa268186b08aa32640f62652126bb074bb8b0486be16",
+        "bytes":  3832
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\mapping.cpython-312.pyc",
+        "sha256":  "8a2af72d75ad41a10986f5ca690938d030d91bda5ed6473c41d369d18a60e2bc",
+        "bytes":  6561
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\mapping.cpython-314.pyc",
+        "sha256":  "329a0a2a1a2ed92807780ef95d368f1bef179a5aa1407a66b00950760d59a7c9",
+        "bytes":  7838
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\test_manager.cpython-312-pytest-9.1.1.pyc",
+        "sha256":  "eb1b224a553c223342401d8055e4c7013e3d73bcfeca82dd190a8e9dddc8d2d3",
+        "bytes":  4388
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\test_manager.cpython-314-pytest-8.4.1.pyc",
+        "sha256":  "0601fc453a553bc0eac61c6ce7878fc315785efcbf5ddad1c895e539180e2a3a",
+        "bytes":  5115
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\test_manager.cpython-314.pyc",
+        "sha256":  "bdb2a46e12f8c1b0c22382fa1f4f07d7d68349279771bf1052768f45ffb7417d",
+        "bytes":  4914
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\ui.cpython-314.pyc",
+        "sha256":  "fa6c5530346b3832b94e2bee2b4bf3cc7d640de679e93a36d847d8d1acae3fdb",
+        "bytes":  37369
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\__init__.cpython-312.pyc",
+        "sha256":  "3b4c27934703568cc2d75a4dba36d345c6797eab7aac437c5b18005ad7705e6a",
+        "bytes":  314
+    },
+    {
+        "path":  "ipro_bench\\__pycache__\\__init__.cpython-314.pyc",
+        "sha256":  "ff4f409df6a71ddff4ab4965bbb5676e513fb65b283262246eb116fa060c81ed",
+        "bytes":  228
+    },
+    {
+        "path":  "testes\\test_diagnostico_modbus_tcp.py",
+        "sha256":  "925cb75d1a4d46e93a5aa5271a28d0e64ba594682216ceaa24a8e266f0a718f0",
+        "bytes":  844
+    },
+    {
+        "path":  "testes\\test_ipro_bench_core.py",
+        "sha256":  "b3ee5d647f77f118622a083404a10612069d37ac906cd52e9bed8283b387f7b4",
+        "bytes":  2400
+    },
+    {
+        "path":  "testes\\test_ipro_estado.py",
+        "sha256":  "4c745491113b6386d738e32faabf125befe33cb42b7450eeaffe4eb57e5ddfac",
+        "bytes":  9468
+    },
+    {
+        "path":  "testes\\test_leitor_ipro_tcp.py",
+        "sha256":  "2101869c9d65ce70b1eb9cf076ee7c0306503ceb2d76c03e6f7eec2b26921369",
+        "bytes":  2340
+    },
+    {
+        "path":  "testes\\test_leitor_ipro_tcp_profissional.py",
+        "sha256":  "1792ab87b854743924bfe4efccfaf0133cbaf36a5436fd29d13db4e0490d95f8",
+        "bytes":  2359
+    },
+    {
+        "path":  "testes\\test_simulador_ipro_rs485.py",
+        "sha256":  "6d1a906be3d63a0671c3603a1b8bb86a5fa9b1ceccc2a7087df8b5d3f196bfb2",
+        "bytes":  2108
+    },
+    {
+        "path":  "testes\\test_validacao_fisica_temp_ambiente.py",
+        "sha256":  "c6923f242912326fa20b72ef142dfcdba1001bde36cf9b794913972eb91dad13",
+        "bytes":  1858
+    },
+    {
+        "path":  "testes\\__pycache__\\test_diagnostico_modbus_tcp.cpython-312-pytest-9.1.1.pyc",
+        "sha256":  "b42268d94cb91aef4e03d6748745d3bbe064a3808591e420fcac430d19f794b5",
+        "bytes":  2257
+    },
+    {
+        "path":  "testes\\__pycache__\\test_diagnostico_modbus_tcp.cpython-312.pyc",
+        "sha256":  "50b48f0b5059bbc3e8859a9523156863e95e196527cf993ae27ce5d0b86061d8",
+        "bytes":  2056
+    },
+    {
+        "path":  "testes\\__pycache__\\test_diagnostico_modbus_tcp.cpython-314-pytest-8.4.1.pyc",
+        "sha256":  "6bda6ba6e9a0aa06a55005385aebfcccddd4aaeb55c02d53a4c69db1de2c8039",
+        "bytes":  2392
+    },
+    {
+        "path":  "testes\\__pycache__\\test_ipro_bench_core.cpython-312-pytest-9.1.1.pyc",
+        "sha256":  "c9620cab6451614fbee81b205b26d53c494280b5b1c596e80c2ea24ac82efb6f",
+        "bytes":  11805
+    },
+    {
+        "path":  "testes\\__pycache__\\test_ipro_bench_core.cpython-314-pytest-8.4.1.pyc",
+        "sha256":  "c7377641f08b46796805385bc1b0f3aa8bdc9751fb3566e833c755654c4ca543",
+        "bytes":  12584
+    },
+    {
+        "path":  "testes\\__pycache__\\test_ipro_estado.cpython-312-pytest-9.1.1.pyc",
+        "sha256":  "3bdbd7d5e76805e728ae2873bd23df902e946962c6228a1a686cd3310859aaa9",
+        "bytes":  16070
+    },
+    {
+        "path":  "testes\\__pycache__\\test_ipro_estado.cpython-312.pyc",
+        "sha256":  "a801667db67a7d575b0b0caab1ac391c67f4dce538149752757b0846b20b30f2",
+        "bytes":  15957
+    },
+    {
+        "path":  "testes\\__pycache__\\test_ipro_estado.cpython-314-pytest-8.4.1.pyc",
+        "sha256":  "d23de5f0ec133a732794c62ed769b39aef317abf84b999df36ac602e045e7383",
+        "bytes":  17343
+    },
+    {
+        "path":  "testes\\__pycache__\\test_ipro_estado.cpython-314.pyc",
+        "sha256":  "f0c383b5a52a32d7f288c9eef8c830fe05bc9979e326e99f56cad8d3242ea8ca",
+        "bytes":  17230
+    },
+    {
+        "path":  "testes\\__pycache__\\test_leitor_ipro_tcp.cpython-312-pytest-9.1.1.pyc",
+        "sha256":  "04331dc177a10fdc4b9c580f8329bdd75919f581051f67e08697797a56d20684",
+        "bytes":  4927
+    },
+    {
+        "path":  "testes\\__pycache__\\test_leitor_ipro_tcp.cpython-312.pyc",
+        "sha256":  "15e1329531643efd039f0eceaa34f97edfbe8004af5dc215e78a1b9ed8c2dfe4",
+        "bytes":  4814
+    },
+    {
+        "path":  "testes\\__pycache__\\test_leitor_ipro_tcp.cpython-314-pytest-8.4.1.pyc",
+        "sha256":  "5651d1356ec57e528c5eb9af7c50a7f2c3f42544dd2210290d76ebe3ef06deb9",
+        "bytes":  5431
+    },
+    {
+        "path":  "testes\\__pycache__\\test_leitor_ipro_tcp_profissional.cpython-312-pytest-9.1.1.pyc",
+        "sha256":  "1c475c99c219c4ece94ff464dfd95062e91d803b1a0a979c566f1e3b0359d408",
+        "bytes":  4903
+    },
+    {
+        "path":  "testes\\__pycache__\\test_leitor_ipro_tcp_profissional.cpython-312.pyc",
+        "sha256":  "a83076366328d5bebb2f0e6d16e419d4a14a72154ff14e0f33eb4c5c8bfb8c17",
+        "bytes":  4790
+    },
+    {
+        "path":  "testes\\__pycache__\\test_leitor_ipro_tcp_profissional.cpython-314-pytest-8.4.1.pyc",
+        "sha256":  "23d6c48af3ffc97f57711fdecdb5e66bdc9d656096b78eff85beb0f0c7f1d98f",
+        "bytes":  5213
+    },
+    {
+        "path":  "testes\\__pycache__\\test_simulador_ipro_rs485.cpython-312-pytest-9.1.1.pyc",
+        "sha256":  "eba0da2e40af2c47bdc684879522522aa19f9c0123fd0c9119ed08a49a146c43",
+        "bytes":  4443
+    },
+    {
+        "path":  "testes\\__pycache__\\test_simulador_ipro_rs485.cpython-312.pyc",
+        "sha256":  "127157b9fc3af7879e79da97a6b25aa584d931cb424e79fb1909294b4a9492a6",
+        "bytes":  4242
+    },
+    {
+        "path":  "testes\\__pycache__\\test_simulador_ipro_rs485.cpython-314-pytest-8.4.1.pyc",
+        "sha256":  "3d9368745b3574f2103345fdfc08aa20885f4d4703e68c7bc634a8672d716d36",
+        "bytes":  4641
+    },
+    {
+        "path":  "testes\\__pycache__\\test_validacao_fisica_temp_ambiente.cpython-312-pytest-9.1.1.pyc",
+        "sha256":  "1e17c0a2ef6dcb02a31c94316fe589a0e584e77eedee84e0e09983a6e7f91574",
+        "bytes":  4231
+    },
+    {
+        "path":  "testes\\__pycache__\\test_validacao_fisica_temp_ambiente.cpython-312.pyc",
+        "sha256":  "8937309a97137f3db35ad694012c49aabae1baf03c834e0da876dc88864a0aec",
+        "bytes":  4118
+    },
+    {
+        "path":  "testes\\__pycache__\\test_validacao_fisica_temp_ambiente.cpython-314-pytest-8.4.1.pyc",
+        "sha256":  "5d2783b9372e23f20360e50e50658c0e9ebf6bf9c4c1f84f7c6767345ae8735f",
+        "bytes":  4505
+    }
+]

@@ -1,0 +1,14 @@
+{
+  "controller_id": "ipro",
+  "manufacturer": "Copeland / Emerson",
+  "model": "iPro IPG215D",
+  "mode": "SOMENTE LEITURA",
+  "allowed_functions": [3, 4],
+  "transport": {
+    "type": "Modbus TCP",
+    "activation": "EXPLÍCITA",
+    "automatic_connection": false
+  },
+  "official_map": "official_map.json",
+  "candidate_map": "../../modbus_map.json"
+}

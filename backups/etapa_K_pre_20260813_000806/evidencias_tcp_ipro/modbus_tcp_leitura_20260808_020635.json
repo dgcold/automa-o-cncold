@@ -1,0 +1,970 @@
+[
+  {
+    "timestamp": "2026-08-08T02:06:35.054-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 384,
+    "quantidade": 1,
+    "requisicao_hex": "00 01 00 00 00 06 01 03 01 80 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 01 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.163-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 385,
+    "quantidade": 1,
+    "requisicao_hex": "00 02 00 00 00 06 01 03 01 81 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 02 00 00 00 05 01 03 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.167-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 386,
+    "quantidade": 1,
+    "requisicao_hex": "00 03 00 00 00 06 01 03 01 82 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 03 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.173-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 387,
+    "quantidade": 1,
+    "requisicao_hex": "00 04 00 00 00 06 01 03 01 83 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      1
+    ],
+    "int16": [
+      1
+    ],
+    "resposta_hex": "00 04 00 00 00 05 01 03 02 00 01"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.177-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 388,
+    "quantidade": 1,
+    "requisicao_hex": "00 05 00 00 00 06 01 03 01 84 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 05 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.182-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 389,
+    "quantidade": 1,
+    "requisicao_hex": "00 06 00 00 00 06 01 03 01 85 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 06 00 00 00 05 01 03 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.186-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 390,
+    "quantidade": 1,
+    "requisicao_hex": "00 07 00 00 00 06 01 03 01 86 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 07 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.189-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 391,
+    "quantidade": 1,
+    "requisicao_hex": "00 08 00 00 00 06 01 03 01 87 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 08 00 00 00 05 01 03 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.192-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 392,
+    "quantidade": 1,
+    "requisicao_hex": "00 09 00 00 00 06 01 03 01 88 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 09 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.197-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 393,
+    "quantidade": 1,
+    "requisicao_hex": "00 0A 00 00 00 06 01 03 01 89 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      1
+    ],
+    "int16": [
+      1
+    ],
+    "resposta_hex": "00 0A 00 00 00 05 01 03 02 00 01"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.202-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 394,
+    "quantidade": 1,
+    "requisicao_hex": "00 0B 00 00 00 06 01 03 01 8A 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 0B 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.206-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 395,
+    "quantidade": 1,
+    "requisicao_hex": "00 0C 00 00 00 06 01 03 01 8B 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      1
+    ],
+    "int16": [
+      1
+    ],
+    "resposta_hex": "00 0C 00 00 00 05 01 03 02 00 01"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.214-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 396,
+    "quantidade": 1,
+    "requisicao_hex": "00 0D 00 00 00 06 01 03 01 8C 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 0D 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.219-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 397,
+    "quantidade": 1,
+    "requisicao_hex": "00 0E 00 00 00 06 01 03 01 8D 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      1
+    ],
+    "int16": [
+      1
+    ],
+    "resposta_hex": "00 0E 00 00 00 05 01 03 02 00 01"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.226-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 398,
+    "quantidade": 1,
+    "requisicao_hex": "00 0F 00 00 00 06 01 03 01 8E 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 0F 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.232-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 399,
+    "quantidade": 1,
+    "requisicao_hex": "00 10 00 00 00 06 01 03 01 8F 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 10 00 00 00 05 01 03 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.235-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 400,
+    "quantidade": 1,
+    "requisicao_hex": "00 11 00 00 00 06 01 03 01 90 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 11 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.240-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 401,
+    "quantidade": 1,
+    "requisicao_hex": "00 12 00 00 00 06 01 03 01 91 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 12 00 00 00 05 01 03 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.246-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 402,
+    "quantidade": 1,
+    "requisicao_hex": "00 13 00 00 00 06 01 03 01 92 00 01",
+    "status": "EXCECAO",
+    "codigo_excecao": 2,
+    "registros": [],
+    "resposta_hex": "00 13 00 00 00 03 01 83 02"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.252-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 403,
+    "quantidade": 1,
+    "requisicao_hex": "00 14 00 00 00 06 01 03 01 93 00 01",
+    "status": "EXCECAO",
+    "codigo_excecao": 2,
+    "registros": [],
+    "resposta_hex": "00 14 00 00 00 03 01 83 02"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.255-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 404,
+    "quantidade": 1,
+    "requisicao_hex": "00 15 00 00 00 06 01 03 01 94 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 15 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.260-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 405,
+    "quantidade": 1,
+    "requisicao_hex": "00 16 00 00 00 06 01 03 01 95 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 16 00 00 00 05 01 03 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.266-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 406,
+    "quantidade": 1,
+    "requisicao_hex": "00 17 00 00 00 06 01 03 01 96 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 17 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.269-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 407,
+    "quantidade": 1,
+    "requisicao_hex": "00 18 00 00 00 06 01 03 01 97 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 18 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.274-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 408,
+    "quantidade": 1,
+    "requisicao_hex": "00 19 00 00 00 06 01 03 01 98 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      0
+    ],
+    "int16": [
+      0
+    ],
+    "resposta_hex": "00 19 00 00 00 05 01 03 02 00 00"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.278-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 3,
+    "endereco": 409,
+    "quantidade": 1,
+    "requisicao_hex": "00 1A 00 00 00 06 01 03 01 99 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 1A 00 00 00 05 01 03 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.285-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 384,
+    "quantidade": 1,
+    "requisicao_hex": "00 1B 00 00 00 06 01 04 01 80 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 1B 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.289-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 385,
+    "quantidade": 1,
+    "requisicao_hex": "00 1C 00 00 00 06 01 04 01 81 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 1C 00 00 00 05 01 04 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.293-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 386,
+    "quantidade": 1,
+    "requisicao_hex": "00 1D 00 00 00 06 01 04 01 82 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 1D 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.297-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 387,
+    "quantidade": 1,
+    "requisicao_hex": "00 1E 00 00 00 06 01 04 01 83 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      1
+    ],
+    "int16": [
+      1
+    ],
+    "resposta_hex": "00 1E 00 00 00 05 01 04 02 00 01"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.303-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 388,
+    "quantidade": 1,
+    "requisicao_hex": "00 1F 00 00 00 06 01 04 01 84 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 1F 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.309-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 389,
+    "quantidade": 1,
+    "requisicao_hex": "00 20 00 00 00 06 01 04 01 85 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 20 00 00 00 05 01 04 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.313-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 390,
+    "quantidade": 1,
+    "requisicao_hex": "00 21 00 00 00 06 01 04 01 86 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 21 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.319-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 391,
+    "quantidade": 1,
+    "requisicao_hex": "00 22 00 00 00 06 01 04 01 87 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 22 00 00 00 05 01 04 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.322-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 392,
+    "quantidade": 1,
+    "requisicao_hex": "00 23 00 00 00 06 01 04 01 88 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 23 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.327-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 393,
+    "quantidade": 1,
+    "requisicao_hex": "00 24 00 00 00 06 01 04 01 89 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      1
+    ],
+    "int16": [
+      1
+    ],
+    "resposta_hex": "00 24 00 00 00 05 01 04 02 00 01"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.332-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 394,
+    "quantidade": 1,
+    "requisicao_hex": "00 25 00 00 00 06 01 04 01 8A 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 25 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.338-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 395,
+    "quantidade": 1,
+    "requisicao_hex": "00 26 00 00 00 06 01 04 01 8B 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      1
+    ],
+    "int16": [
+      1
+    ],
+    "resposta_hex": "00 26 00 00 00 05 01 04 02 00 01"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.342-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 396,
+    "quantidade": 1,
+    "requisicao_hex": "00 27 00 00 00 06 01 04 01 8C 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 27 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.355-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 397,
+    "quantidade": 1,
+    "requisicao_hex": "00 28 00 00 00 06 01 04 01 8D 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      1
+    ],
+    "int16": [
+      1
+    ],
+    "resposta_hex": "00 28 00 00 00 05 01 04 02 00 01"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.369-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 398,
+    "quantidade": 1,
+    "requisicao_hex": "00 29 00 00 00 06 01 04 01 8E 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 29 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.390-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 399,
+    "quantidade": 1,
+    "requisicao_hex": "00 2A 00 00 00 06 01 04 01 8F 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 2A 00 00 00 05 01 04 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.397-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 400,
+    "quantidade": 1,
+    "requisicao_hex": "00 2B 00 00 00 06 01 04 01 90 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 2B 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.408-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 401,
+    "quantidade": 1,
+    "requisicao_hex": "00 2C 00 00 00 06 01 04 01 91 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 2C 00 00 00 05 01 04 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.423-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 402,
+    "quantidade": 1,
+    "requisicao_hex": "00 2D 00 00 00 06 01 04 01 92 00 01",
+    "status": "EXCECAO",
+    "codigo_excecao": 2,
+    "registros": [],
+    "resposta_hex": "00 2D 00 00 00 03 01 84 02"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.437-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 403,
+    "quantidade": 1,
+    "requisicao_hex": "00 2E 00 00 00 06 01 04 01 93 00 01",
+    "status": "EXCECAO",
+    "codigo_excecao": 2,
+    "registros": [],
+    "resposta_hex": "00 2E 00 00 00 03 01 84 02"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.449-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 404,
+    "quantidade": 1,
+    "requisicao_hex": "00 2F 00 00 00 06 01 04 01 94 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 2F 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.456-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 405,
+    "quantidade": 1,
+    "requisicao_hex": "00 30 00 00 00 06 01 04 01 95 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      3
+    ],
+    "int16": [
+      3
+    ],
+    "resposta_hex": "00 30 00 00 00 05 01 04 02 00 03"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.469-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 406,
+    "quantidade": 1,
+    "requisicao_hex": "00 31 00 00 00 06 01 04 01 96 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 31 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.482-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 407,
+    "quantidade": 1,
+    "requisicao_hex": "00 32 00 00 00 06 01 04 01 97 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 32 00 00 00 05 01 04 02 7F FF"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.494-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 408,
+    "quantidade": 1,
+    "requisicao_hex": "00 33 00 00 00 06 01 04 01 98 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      0
+    ],
+    "int16": [
+      0
+    ],
+    "resposta_hex": "00 33 00 00 00 05 01 04 02 00 00"
+  },
+  {
+    "timestamp": "2026-08-08T02:06:35.506-03:00",
+    "host": "192.168.0.250",
+    "porta": 502,
+    "unit_id": 1,
+    "funcao": 4,
+    "endereco": 409,
+    "quantidade": 1,
+    "requisicao_hex": "00 34 00 00 00 06 01 04 01 99 00 01",
+    "status": "OK",
+    "codigo_excecao": null,
+    "registros": [
+      32767
+    ],
+    "int16": [
+      32767
+    ],
+    "resposta_hex": "00 34 00 00 00 05 01 04 02 7F FF"
+  }
+]

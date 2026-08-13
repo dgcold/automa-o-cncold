@@ -1,0 +1,1 @@
+{"event": "SCENARIO_CREATED", "scenario": {"created_at": "2026-08-12T23:55:02.298752-03:00", "description": "Cenário seguro preparado offline", "id": "CEN-87FA2AB5", "name": "TESTE 01 - FALHA DE RECUPERACAO POS-DEGELO", "safe_offline": true, "status": "RASCUNHO", "steps": []}, "timestamp": "2026-08-12T23:55:02.298953-03:00"}

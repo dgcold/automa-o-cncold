@@ -1,0 +1,9 @@
+{
+  "metadata": {
+    "controller_id": "ipro",
+    "kind": "OFFICIAL",
+    "status": "AGUARDANDO MAPA MODBUS OFICIAL",
+    "notes": "Arquivo reservado exclusivamente ao mapa oficial. Candidatos permanecem em config/modbus_map.json."
+  },
+  "variables": []
+}
