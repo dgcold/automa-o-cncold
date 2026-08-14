@@ -49,6 +49,7 @@ class TestCriterion:
     event: str
     should_exist: bool = True
     maximum_seconds: float | None = None
+    evidence_family: str = ""
 
 
 @dataclass

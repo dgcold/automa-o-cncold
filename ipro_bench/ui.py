@@ -7,10 +7,13 @@ from pathlib import Path
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QApplication,
     QComboBox,
+    QDoubleSpinBox,
     QFileDialog,
     QFrame,
+    QFormLayout,
     QGridLayout,
     QHBoxLayout,
     QLabel,
@@ -19,6 +22,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QSpinBox,
     QStackedWidget,
     QTableWidget,
     QTableWidgetItem,
@@ -51,6 +55,11 @@ from .technician_diagnostics import (
     TechnicianDiagnosticEngine, display_value, technician_label,
 )
 from .analysis_integration import SessionEvidenceInterpreter
+from .defrost_investigation import FAMILY_DESCRIPTIONS, investigate_defrost
+from .coil_calculator import CoilGeometry, FinnedCoilCalculator
+from .refrigeration_analysis import RefrigerationAnalyzer
+from .ui_components import MultiSeriesChart
+from refrigerantes import REFRIGERANTES
 
 STYLE = """
 QMainWindow, QWidget { background: #0b1220; color: #dce6f2; font-family: 'Segoe UI'; font-size: 13px; }
@@ -164,7 +173,7 @@ class MainWindow(QMainWindow):
     NAVIGATION = (
         "Dashboard", "Sensores", "I/O", "Medição Elétrica", "Modbus", "Mapa",
         "Cenários", "Testes", "Caixa-Preta", "Timeline", "Gráficos", "Histórico", "Evidências",
-        "Baseline", "Baseline × Sessão", "Análise de Degelo", "Degelo × Referência", "Investigação de Evento", "Diagnóstico", "Análise IA", "Saúde da Máquina", "Relatórios",
+        "Baseline", "Baseline × Sessão", "Análise de Degelo", "Degelo × Referência", "Investigação de Evento", "Diagnóstico", "Análise IA", "Análise Frigorífica", "Serpentina Aletada", "Saúde da Máquina", "Relatórios",
     )
 
     def __init__(self, project_root: Path) -> None:
@@ -259,6 +268,8 @@ class MainWindow(QMainWindow):
         self.pages.addWidget(self._incident_page())
         self.pages.addWidget(self._diagnostics_page())
         self.pages.addWidget(self._ai_page())
+        self.pages.addWidget(self._refrigeration_page())
+        self.pages.addWidget(self._coil_page())
         self.pages.addWidget(self._health_page())
         self.pages.addWidget(self._reports_page())
         content_layout.addWidget(self.pages, 1)
@@ -477,12 +488,68 @@ class MainWindow(QMainWindow):
         load=QPushButton("Carregar sessão histórica");load.clicked.connect(self._load_historical_session)
         self.historical_status=QLabel("TEMPO REAL · SEM DADOS · NÃO CONECTADO",objectName="muted")
         controls.addWidget(self.historical_session,1);controls.addWidget(load);controls.addWidget(self.historical_status);layout.addLayout(controls)
-        layout.addWidget(QLabel("Gráficos", objectName="title"))
+        layout.addWidget(QLabel("Curvas históricas por variável", objectName="title"))
+        layout.addWidget(QLabel("Selecione uma ou mais variáveis para comparar na mesma referência temporal.", objectName="muted"))
+        self.graph_variables = QListWidget()
+        self.graph_variables.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.graph_variables.setMaximumHeight(120)
+        self.graph_variables.itemSelectionChanged.connect(self._refresh_graph_selection)
+        layout.addWidget(self.graph_variables)
+        self.process_chart = MultiSeriesChart("Sessão histórica · curvas selecionadas")
+        # Compatibility buffers retained for integrations that consume the former aggregates.
         self.sensor_chart = TrendChart("Sensores e processo")
-        self.electrical_chart = TrendChart("Corrente total / compressor / L1 / L2 / L3")
-        layout.addWidget(self.sensor_chart)
-        layout.addWidget(self.electrical_chart)
+        self.electrical_chart = TrendChart("Medição elétrica")
+        layout.addWidget(self.process_chart, 1)
         return page
+
+    def _refrigeration_page(self) -> QWidget:
+        page, layout = self._page()
+        layout.addWidget(QLabel("Análise Frigorífica", objectName="title"))
+        layout.addWidget(QLabel("Apoio técnico: o resultado não confirma carga baixa ou vazamento sem verificação física.", objectName="muted"))
+        form = QFormLayout()
+        self.refrigerant = QComboBox(); self.refrigerant.addItems(REFRIGERANTES)
+        self.suction_pressure = self._numeric_input(0, 1000, 1)
+        self.suction_temperature = self._numeric_input(-100, 200, 1)
+        self.discharge_pressure = self._numeric_input(0, 1500, 1)
+        self.liquid_temperature = self._numeric_input(-100, 200, 1)
+        for label, widget in (("Refrigerante", self.refrigerant), ("Pressão de sucção (psig)", self.suction_pressure),
+                              ("Temperatura da sucção (°C)", self.suction_temperature),
+                              ("Pressão de condensação (psig)", self.discharge_pressure),
+                              ("Temperatura da linha de líquido (°C)", self.liquid_temperature)):
+            form.addRow(label, widget)
+        layout.addLayout(form)
+        calculate = QPushButton("Calcular superaquecimento e subresfriamento")
+        calculate.clicked.connect(self._calculate_refrigeration); layout.addWidget(calculate)
+        self.refrigeration_result = QTextEdit(); self.refrigeration_result.setReadOnly(True)
+        layout.addWidget(self.refrigeration_result, 1)
+        return page
+
+    def _coil_page(self) -> QWidget:
+        page, layout = self._page()
+        layout.addWidget(QLabel("Calculadora de Serpentina Aletada", objectName="title"))
+        layout.addWidget(QLabel("Dimensões em metros; fórmulas e áreas parciais permanecem visíveis para auditoria.", objectName="muted"))
+        form = QFormLayout()
+        self.coil_tubes = QSpinBox(); self.coil_tubes.setRange(1, 10000)
+        self.coil_fins = QSpinBox(); self.coil_fins.setRange(1, 100000)
+        self.coil_diameter = self._numeric_input(0.0001, 10, 4)
+        self.coil_length = self._numeric_input(0.0001, 100, 3)
+        self.coil_height = self._numeric_input(0.0001, 100, 3)
+        self.coil_width = self._numeric_input(0.0001, 100, 3)
+        self.coil_thickness = self._numeric_input(0.00001, 1, 5)
+        for label, widget in (("Tubos", self.coil_tubes), ("Aletas", self.coil_fins),
+                              ("Diâmetro externo do tubo", self.coil_diameter), ("Comprimento do tubo", self.coil_length),
+                              ("Altura da aleta", self.coil_height), ("Largura da aleta", self.coil_width),
+                              ("Espessura da aleta", self.coil_thickness)):
+            form.addRow(label, widget)
+        layout.addLayout(form)
+        calculate = QPushButton("Calcular área de troca"); calculate.clicked.connect(self._calculate_coil); layout.addWidget(calculate)
+        self.coil_result = QTextEdit(); self.coil_result.setReadOnly(True); layout.addWidget(self.coil_result, 1)
+        return page
+
+    @staticmethod
+    def _numeric_input(low: float, high: float, decimals: int) -> QDoubleSpinBox:
+        widget = QDoubleSpinBox(); widget.setRange(low, high); widget.setDecimals(decimals)
+        return widget
 
     def _blackbox_page(self) -> QWidget:
         page, layout = self._page()
@@ -530,7 +597,7 @@ class MainWindow(QMainWindow):
         confirmation=QHBoxLayout(); self.technician_name=QLineEdit(); self.technician_name.setPlaceholderText("Técnico")
         self.technician_note=QLineEdit(); self.technician_note.setPlaceholderText("Observação")
         confirmation.addWidget(self.technician_name); confirmation.addWidget(self.technician_note,1)
-        for label,decision in (("Confirmar diagnóstico",ConfirmationDecision.CONFIRMED),("Rejeitar hipótese",ConfirmationDecision.REJECTED),("Marcar inconclusivo",ConfirmationDecision.INCONCLUSIVE)):
+        for label,decision in (("Evidência suficiente",ConfirmationDecision.SUFFICIENT),("Descartar hipótese",ConfirmationDecision.REJECTED),("Confirmar manualmente",ConfirmationDecision.CONFIRMED)):
             button=QPushButton(label);button.clicked.connect(lambda checked=False,value=decision:self._confirm_technician_diagnostic(value));confirmation.addWidget(button)
         layout.addLayout(confirmation)
         layout.addWidget(QLabel("EVENTOS RELACIONADOS / REGISTROS BRUTOS", objectName="title"))
@@ -1105,10 +1172,24 @@ class MainWindow(QMainWindow):
         complete_rows = self.blackbox_store.query(session_id)
         facts=SessionEvidenceInterpreter(self.blackbox_store).extract(session_id)
         diagnostic = self.technician_diagnostic_engine.analyze_families(session_id,complete_rows,facts,equipment=self.active_controller.identity.display_name)
+        defrost_cycles = self.defrost_analyzer.identify(session_id)
+        defrost_text = ""
+        if defrost_cycles:
+            investigation = investigate_defrost(defrost_cycles[-1], complete_rows)
+            family_text = "\n".join(f"- {family}: {FAMILY_DESCRIPTIONS[family]}" for family in investigation.families)
+            confidence = "NÃO DETERMINADA" if investigation.confidence is None else f"{investigation.confidence:.0%}"
+            defrost_text = "\n\n".join((f"INVESTIGAÇÃO MULTIVARIÁVEL DO DEGELO\n{investigation.conclusion}",
+                f"INÍCIO / FIM / DURAÇÃO\n{investigation.start} · {investigation.end} · {display_value(investigation.duration_seconds,'s')}",
+                f"VARIÁVEIS\n{', '.join(technician_label(item) for item in investigation.variables) or 'SEM DADOS'}",
+                f"FAMÍLIAS DE EVIDÊNCIA\n{family_text or 'SEM DADOS'}",f"CONFIANÇA\n{confidence} · {investigation.confidence_reason}",
+                f"REFERÊNCIA\n{investigation.reference}"))
         first=diagnostic.first_deviation
         first_text="NÃO IDENTIFICADO" if first is None else (f"{first.timestamp} | {first.variable} | anterior {display_value(first.previous_value)} | atual {display_value(first.current_value)} | diferença {display_value(first.difference)} | esperado {first.expected} | observado {first.observed} | severidade {first.severity} | evidências {', '.join(map(str,first.evidence_ids))}")
         latest=self.technician_confirmations.latest(session_id); confirmation_text=latest["decision"]+" por "+latest["technician"] if latest else "PENDENTE"
-        self.technician_diagnostic.setText("\n\n".join((f"STATUS DA MÁQUINA\n{diagnostic.machine_status}",f"PRIMEIRO DESVIO DETECTADO\n{first_text}",f"FALHA / ANOMALIA IDENTIFICADA\n{diagnostic.anomaly}",f"O QUE ACONTECEU\n{diagnostic.what_happened}",f"O QUE FOI OBSERVADO\n"+"\n".join(diagnostic.observations),f"EVIDÊNCIAS\n{', '.join(map(str,diagnostic.evidence_ids)) or 'SEM DADOS'}",f"POSSÍVEIS CAUSAS / HIPÓTESES\n"+"\n".join("- "+x for x in diagnostic.hypotheses),f"IMPACTO\n{diagnostic.impact}",f"O QUE O TÉCNICO DEVE VERIFICAR\n"+"\n".join("- "+x for x in diagnostic.recommended_checks),f"CONFIANÇA\n{'NÃO DETERMINADA' if diagnostic.confidence is None else f'{diagnostic.confidence:.0%}'}",f"CONFIRMAÇÃO DO TÉCNICO\n{confirmation_text}")))
+        sections=[f"STATUS DA MÁQUINA\n{diagnostic.machine_status}",f"PRIMEIRO DESVIO DETECTADO\n{first_text}",f"FALHA / ANOMALIA IDENTIFICADA\n{diagnostic.anomaly}",f"O QUE ACONTECEU\n{diagnostic.what_happened}",f"O QUE FOI OBSERVADO\n"+"\n".join(diagnostic.observations),f"EVIDÊNCIAS\n{', '.join(map(str,diagnostic.evidence_ids)) or 'SEM DADOS'}",f"POSSÍVEIS CAUSAS / HIPÓTESES\n"+"\n".join("- "+x for x in diagnostic.hypotheses),f"IMPACTO\n{diagnostic.impact}",f"O QUE O TÉCNICO DEVE VERIFICAR\n"+"\n".join("- "+x for x in diagnostic.recommended_checks),f"CONFIANÇA\n{'NÃO DETERMINADA' if diagnostic.confidence is None else f'{diagnostic.confidence:.0%}'}"]
+        if defrost_text:sections.append(defrost_text)
+        sections.append(f"DECISÃO DO TÉCNICO (SEPARADA DA ANÁLISE AUTOMÁTICA)\n{confirmation_text}")
+        self.technician_diagnostic.setText("\n\n".join(sections))
         self.timeline_table.setRowCount(len(rows))
         for row, item in enumerate(rows):
             item = dict(item)
@@ -1122,7 +1203,7 @@ class MainWindow(QMainWindow):
         session_id=self._timeline_session_id()
         if not session_id:return
         diagnostic=self.technician_diagnostic_engine.analyze(session_id,self.blackbox_store.query(session_id))
-        try:self.technician_confirmations.record(session_id,self.technician_name.text(),diagnostic.anomaly,decision,self.technician_note.text())
+        try:self.technician_confirmations.record(session_id,self.technician_name.text(),diagnostic.anomaly,decision,self.technician_note.text(),diagnostic.evidence_ids)
         except ValueError as error:QMessageBox.warning(self,"Confirmação do técnico",str(error));return
         self._refresh_timeline()
 
@@ -1313,13 +1394,62 @@ class MainWindow(QMainWindow):
         try:session_id=self.blackbox_store.resolve_session_id(self.historical_session.text().strip())
         except (KeyError,ValueError) as error:self.historical_status.setText(f"SESSÃO NÃO ENCONTRADA · {error}");return
         all_rows=self.blackbox_store.query(session_id,limit=self.services.settings.analysis.export_limit)
-        rows=[row for row in all_rows if row.get("kind") == TimelineKind.SAMPLE.value];sensor_ids={"temperature_chamber","temperature_evaporator","pressure_suction","pressure_discharge"};electrical_ids={"current_total","current_compressor","current_l1","current_l2","current_l3"}
-        sensors=[float(r["value"]) for r in rows if r.get("variable_id") in sensor_ids and isinstance(r.get("value"),(int,float))]
-        electrical=[float(r["value"]) for r in rows if r.get("variable_id") in electrical_ids and isinstance(r.get("value"),(int,float))]
-        self.sensor_chart.set_values(sensors);self.electrical_chart.set_values(electrical)
+        rows=[row for row in all_rows if row.get("kind") == TimelineKind.SAMPLE.value]
+        sensor_ids={"temperature_chamber","temperature_evaporator","pressure_suction","pressure_discharge"}
+        electrical_ids={"current_total","current_compressor","current_l1","current_l2","current_l3"}
+        self.sensor_chart.set_values([float(row["value"]) for row in rows if row.get("variable_id") in sensor_ids and isinstance(row.get("value"),(int,float))])
+        self.electrical_chart.set_values([float(row["value"]) for row in rows if row.get("variable_id") in electrical_ids and isinstance(row.get("value"),(int,float))])
+        self.historical_graph_rows = rows
+        self.graph_variables.blockSignals(True); self.graph_variables.clear(); self.process_chart.clear()
+        variables=sorted({row.get("variable_id") for row in rows if row.get("variable_id") and isinstance(row.get("value"),(int,float))})
+        self.graph_variables.addItems(variables)
+        for index in range(min(4, len(variables))): self.graph_variables.item(index).setSelected(True)
+        self.graph_variables.blockSignals(False); self._refresh_graph_selection()
         self._prepare_session_views(session_id,all_rows)
         self._refresh_timeline()
         self.historical_status.setText(f"MODO HISTÓRICO · {session_id} · {len(rows)} AMOSTRAS · {len(all_rows)-len(rows)} EVENTOS")
+
+    def _refresh_graph_selection(self) -> None:
+        rows = getattr(self, "historical_graph_rows", [])
+        selected = {item.text() for item in self.graph_variables.selectedItems()}
+        series = {name: [] for name in selected}
+        for row in rows:
+            name, value, timestamp = row.get("variable_id"), row.get("value"), row.get("timestamp_ns")
+            if name in selected and isinstance(value, (int, float)) and isinstance(timestamp, int):
+                series[name].append((timestamp, float(value)))
+        self.process_chart.set_series(series)
+
+    def _calculate_refrigeration(self) -> None:
+        analyzer = RefrigerationAnalyzer()
+        refrigerant = self.refrigerant.currentText()
+        superheat = analyzer.superheat(self.suction_pressure.value(), self.suction_temperature.value(), refrigerant)
+        subcooling = analyzer.subcooling(self.discharge_pressure.value(), self.liquid_temperature.value(), refrigerant)
+        assessment = analyzer.assess_charge(superheat, subcooling, suction_pressure_psig=self.suction_pressure.value())
+        value = lambda reading: "SEM DADOS" if reading.value_c is None else f"{reading.value_c:.2f} °C"
+        confidence = "NÃO DETERMINADA" if assessment.confidence is None else f"{assessment.confidence:.0%}"
+        self.refrigeration_result.setText("\n\n".join((
+            f"SUPERAQUECIMENTO: {value(superheat)} · {superheat.status.value}\nReferência: {superheat.reference}",
+            f"SUBRESFRIAMENTO: {value(subcooling)} · {subcooling.status.value}\nReferência: {subcooling.reference}",
+            f"HIPÓTESE CAUTELOSA: {assessment.hypothesis}\nConfiança: {confidence}\nJustificativa: {assessment.confidence_reason}",
+            "EVIDÊNCIAS\n" + ("\n".join(f"- {item}" for item in assessment.evidence) or "- Nenhuma relação conclusiva"),
+            "ALTERNATIVAS\n" + "\n".join(f"- {item}" for item in assessment.alternatives),
+            "VERIFICAÇÃO DO TÉCNICO\n" + "\n".join(f"- {item}" for item in assessment.technician_checks),
+        )))
+
+    def _calculate_coil(self) -> None:
+        data = CoilGeometry(self.coil_tubes.value(), self.coil_diameter.value(), self.coil_length.value(),
+                            self.coil_fins.value(), self.coil_height.value(), self.coil_width.value(), self.coil_thickness.value())
+        try: result = FinnedCoilCalculator.calculate(data)
+        except ValueError as error: self.coil_result.setText(str(error)); return
+        self.coil_result.setText("\n".join((
+            f"Área externa dos tubos: {result.tube_external_area_m2:.4f} m²",
+            f"Área bruta das aletas: {result.gross_fin_area_m2:.4f} m²",
+            f"Área ocupada pelos furos: {result.tube_hole_area_m2:.4f} m²",
+            f"Área efetiva das aletas: {result.effective_fin_area_m2:.4f} m²",
+            f"ÁREA TOTAL DE TROCA: {result.total_exchange_area_m2:.4f} m²",
+            f"Densidade: {result.fin_density_per_m:.2f} aletas/m · {result.fpi:.2f} FPI",
+            "", "FÓRMULAS", *result.formula,
+        )))
 
     def _compare_incidents(self) -> None:
         try:result=self.incident_analyzer.compare_events(self._parse_occurrences(self.similar_events.text()))
@@ -1335,9 +1465,11 @@ class MainWindow(QMainWindow):
     def _refresh_hypotheses(self) -> None:
         if not hasattr(self,"hypotheses_table"):return
         items=self.diagnostic_repository.list();self.hypotheses_table.setRowCount(len(items))
+        references={rule.id:f"Critério {rule.id} v{rule.version}: {rule.description} · fonte: {rule.source}" for rule in self.diagnostic_engine.rules}
         for row,item in enumerate(items):
+            contrary="; ".join(a.text for a in item.contrary) or references.get(item.rule_id,"Nenhuma evidência contrária registrada; confirmação física permanece necessária.")
             values=(item.id,item.description,f"{item.confidence:.1%}","; ".join(a.text for a in item.favorable),
-                "; ".join(a.text for a in item.contrary),", ".join(map(str,item.evidence_ids)),item.first_deviation_id or "NÃO DETERMINADO",
+                contrary,", ".join(map(str,item.evidence_ids)),item.first_deviation_id or "NÃO DETERMINADO",
                 item.context,"; ".join(item.missing_confirmation) or "NENHUMA",item.state.value)
             for col,value in enumerate(values):self.hypotheses_table.setItem(row,col,QTableWidgetItem(str(value)))
 

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import json
 import sqlite3
 from dataclasses import dataclass
-from datetime import datetime
 from enum import StrEnum
 from pathlib import Path
 from statistics import fmean
 from typing import Any, Iterable
+
+from .time_utils import brasilia_datetime
 
 
 VARIABLE_LABELS = {
@@ -47,6 +49,7 @@ class DiagnosticPresentation:
 
 
 class ConfirmationDecision(StrEnum):
+    SUFFICIENT = "EVIDÊNCIA SUFICIENTE"
     CONFIRMED = "CONFIRMADO PELO TÉCNICO"
     REJECTED = "HIPÓTESE REJEITADA"
     INCONCLUSIVE = "INCONCLUSIVO"
@@ -59,20 +62,24 @@ class TechnicianConfirmationRepository:
             c.execute("""CREATE TABLE IF NOT EXISTS technician_confirmations(
             id INTEGER PRIMARY KEY AUTOINCREMENT,session_id TEXT NOT NULL,technician TEXT NOT NULL,
             timestamp TEXT NOT NULL,diagnosis TEXT NOT NULL,decision TEXT NOT NULL,observation TEXT NOT NULL)""")
+            columns={row[1] for row in c.execute("PRAGMA table_info(technician_confirmations)")}
+            if "evidence_json" not in columns:
+                c.execute("ALTER TABLE technician_confirmations ADD COLUMN evidence_json TEXT NOT NULL DEFAULT '[]'")
 
-    def record(self,session_id:str,technician:str,diagnosis:str,decision:ConfirmationDecision,observation:str=""):
+    def record(self,session_id:str,technician:str,diagnosis:str,decision:ConfirmationDecision,observation:str="",evidence_ids:Iterable[int]=()):
         if not technician.strip(): raise ValueError("O técnico deve ser identificado.")
-        timestamp=datetime.now().astimezone().isoformat()
+        timestamp=brasilia_datetime().isoformat(); evidence=tuple(dict.fromkeys(int(item) for item in evidence_ids))
         with sqlite3.connect(self.path) as c:
-            cursor=c.execute("INSERT INTO technician_confirmations(session_id,technician,timestamp,diagnosis,decision,observation) VALUES(?,?,?,?,?,?)",
-                (session_id,technician.strip(),timestamp,diagnosis,decision.value,observation.strip()))
+            cursor=c.execute("INSERT INTO technician_confirmations(session_id,technician,timestamp,diagnosis,decision,observation,evidence_json) VALUES(?,?,?,?,?,?,?)",
+                (session_id,technician.strip(),timestamp,diagnosis,decision.value,observation.strip(),json.dumps(evidence)))
         return {"id":cursor.lastrowid,"session_id":session_id,"technician":technician.strip(),"timestamp":timestamp,
-                "diagnosis":diagnosis,"decision":decision.value,"observation":observation.strip()}
+                "diagnosis":diagnosis,"decision":decision.value,"observation":observation.strip(),"evidence_ids":evidence}
 
     def latest(self,session_id:str):
         with sqlite3.connect(self.path) as c:
             c.row_factory=sqlite3.Row; row=c.execute("SELECT * FROM technician_confirmations WHERE session_id=? ORDER BY id DESC LIMIT 1",(session_id,)).fetchone()
-        return dict(row) if row else None
+        if not row:return None
+        result=dict(row);result["evidence_ids"]=tuple(json.loads(result.pop("evidence_json","[]")));return result
 
 
 class TechnicianDiagnosticEngine:

@@ -25,12 +25,38 @@ def _scenario(name: str, fault: str | None = None, *, defrost: bool = False) -> 
         if fault != "COMPRESSOR_NAO_RETORNA_POS_DEGELO":
             fault_time = 305 if fault == "DEGELO_INCOMPLETO" else (411 if defrost else 130)
             steps.append(ScenarioStep(fault_time, ScenarioAction.INJECT_FAULT, fault=fault))
-    if fault == "COMPRESSOR_NAO_RETORNA_POS_DEGELO":
-        criteria = [TestCriterion("Falha de retorno do compressor reproduzida", "COMPRESSOR_COMANDADO_SEM_RESPOSTA", True)]
-    else:
-        criteria = [TestCriterion("Sem desvio de compressor", "COMPRESSOR_COMANDADO_SEM_RESPOSTA", False)]
-    if defrost and fault != "COMPRESSOR_NAO_RETORNA_POS_DEGELO":
-        criteria.append(TestCriterion("Recuperação após degelo", "RECUPERACAO", True))
+    criteria_by_fault = {
+        "COMPRESSOR_NAO_RETORNA_POS_DEGELO": TestCriterion(
+            "Falha de retorno do compressor reproduzida", "COMPRESSOR_COMANDADO_SEM_RESPOSTA"
+        ),
+        "COMPRESSOR_NAO_LIGA": TestCriterion(
+            "Compressor comandado sem resposta", "COMPRESSOR_COMANDADO_SEM_RESPOSTA"
+        ),
+        "VENTILADOR_CONDENSADOR_FALHA": TestCriterion(
+            "Ventilador do condensador sem resposta", "", evidence_family="condenser_fan_without_feedback"
+        ),
+        "SENSOR_INVALIDO": TestCriterion(
+            "Leitura inválida do sensor detectada", "", evidence_family="invalid_sensor_reading"
+        ),
+        "PERDA_COMUNICACAO": TestCriterion(
+            "Perda de comunicação detectada", "", evidence_family="communication_loss_observed"
+        ),
+        "DEGELO_INCOMPLETO": TestCriterion(
+            "Ciclo de degelo incompleto detectado", "", evidence_family="incomplete_defrost_cycle"
+        ),
+        "RECUPERACAO_LENTA": TestCriterion(
+            "Recuperação térmica lenta detectada", "", evidence_family="slow_thermal_recovery"
+        ),
+        "CORRENTE_ELEVADA": TestCriterion(
+            "Corrente elevada do compressor detectada", "", evidence_family="high_compressor_current"
+        ),
+        "DESEQUILIBRIO_FASES": TestCriterion(
+            "Desequilíbrio entre fases detectado", "", evidence_family="phase_current_imbalance"
+        ),
+    }
+    criteria = [criteria_by_fault[fault]] if fault else [
+        TestCriterion("Operação sem anomalia relevante", "", should_exist=False, evidence_family="*")
+    ]
     return Scenario(name, "Cenário estruturado offline · origem SIMULADOR", steps=steps,
                     criteria=criteria, duration_seconds=700 if defrost else 240)
 

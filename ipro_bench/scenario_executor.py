@@ -123,7 +123,8 @@ class ScenarioExecutor:
 
         engine.run_headless(scenario.duration_seconds, tick, step_seconds)
         stopped = self.blackbox.stop()
-        criteria = tuple(self._criterion(item, events.events) for item in scenario.criteria)
+        interpreted = SessionEvidenceInterpreter(self.store).interpret(session.id)
+        criteria = tuple(self._criterion(item, events.events, interpreted.facts) for item in scenario.criteria)
         technical = self._technical(criteria)
         summary = TimelineAnalyzer(self.store).summary(session.id)
         cycles = DefrostCycleAnalyzer(self.store).identify(session.id)
@@ -131,7 +132,6 @@ class ScenarioExecutor:
         investigation = None
         if first:
             investigation = IncidentAnalyzer(self.store).investigate(session.id, first["id"])
-        interpreted = SessionEvidenceInterpreter(self.store).interpret(session.id)
         result = ExecutionResult(scenario.id, engine.execution_id, stopped.id, seed, engine.elapsed, speed,
             engine.status, bus.published, tuple(asdict(item) for item in injector.injected), tuple(events.events),
             criteria, technical, analysis={"timeline": summary, "defrost": [asdict(item) for item in cycles],
@@ -184,11 +184,18 @@ class ScenarioExecutor:
         return tuple(output)
 
     @staticmethod
-    def _criterion(criterion: TestCriterion, events: list[dict]) -> CriterionResult:
-        matches = [item for item in events if item["event"] == criterion.event]
+    def _criterion(criterion: TestCriterion, events: list[dict], evidence_facts=()) -> CriterionResult:
+        if criterion.evidence_family:
+            matches = list(evidence_facts) if criterion.evidence_family == "*" else [
+                item for item in evidence_facts if item.name == criterion.evidence_family
+            ]
+            source = f"evidência {criterion.evidence_family}"
+        else:
+            matches = [item for item in events if item["event"] == criterion.event]
+            source = f"evento {criterion.event}"
         passed = bool(matches) is criterion.should_exist
         return CriterionResult(criterion.name, CriterionOutcome.PASSED if passed else CriterionOutcome.FAILED,
-            f"evento {criterion.event}: {len(matches)} ocorrência(s)")
+            f"{source}: {len(matches)} ocorrência(s)")
 
     @staticmethod
     def _technical(criteria: tuple[CriterionResult, ...]) -> CriterionOutcome:

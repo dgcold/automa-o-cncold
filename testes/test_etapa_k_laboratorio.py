@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 
 from ipro_bench.evidence import EvidenceStore
@@ -90,6 +92,27 @@ def test_test_01_reproduces_expected_fault_and_passes(tmp_path):
     assert "RECUPERACAO" not in {item["event"] for item in result.events}
 
 
+EXPECTED_CRITERIA = (
+    ("COMPRESSOR_COMANDADO_SEM_RESPOSTA", ""),
+    ("", "*"),
+    ("COMPRESSOR_COMANDADO_SEM_RESPOSTA", ""),
+    ("", "condenser_fan_without_feedback"),
+    ("", "invalid_sensor_reading"),
+    ("", "communication_loss_observed"),
+    ("", "incomplete_defrost_cycle"),
+    ("", "slow_thermal_recovery"),
+    ("", "high_compressor_current"),
+    ("", "phase_current_imbalance"),
+)
+
+
+@pytest.mark.parametrize("index,expected", tuple(enumerate(EXPECTED_CRITERIA)))
+def test_professional_scenario_has_specific_acceptance_criterion(index, expected):
+    criterion = default_scenarios()[index].criteria
+    assert len(criterion) == 1
+    assert (criterion[0].event, criterion[0].evidence_family) == expected
+
+
 def test_unmet_criterion_still_fails(tmp_path):
     scenario = Scenario("Critério não atendido", "Offline",
                         criteria=[TestCriterion("Evento obrigatório", "EVENTO_INEXISTENTE", True)],
@@ -121,4 +144,19 @@ def test_all_professional_scenarios_execute(index, tmp_path):
     assert result.samples >= 190
     assert result.status.value == "FINALIZADO"
     assert result.execution_status is ExecutionStatus.COMPLETED
-    assert result.technical_result in (CriterionOutcome.PASSED, CriterionOutcome.FAILED)
+    assert result.technical_result is CriterionOutcome.PASSED
+
+
+@pytest.mark.parametrize("index", [0, 2, 3, 4, 5, 6, 7, 8, 9])
+def test_fault_scenario_fails_when_expected_fault_is_removed(index, tmp_path):
+    scenario = default_scenarios()[index]
+    without_fault = replace(scenario, steps=[
+        step for step in scenario.steps
+        if not (isinstance(step, ScenarioStep) and step.action is ScenarioAction.INJECT_FAULT)
+    ])
+    store = BlackBoxStore(tmp_path / "blackbox.sqlite3")
+    result = ScenarioExecutor(PersistentHistory(tmp_path / "history.sqlite3"), BlackBoxRecorder(store),
+                              store, ReportExporter(tmp_path / "reports")).execute(
+        without_fault, seed=200 + index, speed=100, step_seconds=5)
+    assert result.execution_status is ExecutionStatus.COMPLETED
+    assert result.scenario_verdict is CriterionOutcome.FAILED
