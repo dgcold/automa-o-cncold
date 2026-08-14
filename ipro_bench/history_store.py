@@ -59,7 +59,25 @@ class PersistentHistory:
             return int(cursor.lastrowid)
 
     def append_many(self, samples: Iterable[TelemetrySample]) -> int:
-        return sum(1 for sample in samples if self.append(sample))
+        rows = [
+            (
+                sample.timestamp, sample.channel_id, sample.name, sample.group,
+                sample.value, sample.unit, sample.quality.value, sample.source,
+                int(sample.connected), json.dumps(sample.metadata, ensure_ascii=False),
+            )
+            for sample in samples
+        ]
+        if not rows:
+            return 0
+        with self._connect() as connection:
+            connection.executemany(
+                """INSERT INTO samples
+                (timestamp, channel_id, name, group_name, value, unit, quality,
+                 source, connected, metadata_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                rows,
+            )
+        return len(rows)
 
     def query(self, channel_id: str | None = None, limit: int = 1000) -> list[dict]:
         sql = "SELECT * FROM samples"

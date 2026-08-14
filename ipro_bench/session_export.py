@@ -8,6 +8,8 @@ from pathlib import Path
 
 from .field_diagnostics import BlackBoxStore, TimelineAnalyzer
 from .reports import ReportExporter
+from .technician_diagnostics import TechnicianDiagnosticEngine
+from .analysis_integration import SessionEvidenceInterpreter
 
 
 class DiagnosticSessionExporter:
@@ -35,13 +37,10 @@ class DiagnosticSessionExporter:
         return target
 
     def report(self, session_id: str) -> Path:
-        summary = TimelineAnalyzer(self.store).summary(session_id)
-        first = summary["first_deviation"]
-        rows = [{
-            "sessao": session_id,
-            "registros": summary["records"],
-            "primeiro_desvio": first["message"] if first else "NÃO IDENTIFICADO",
-            "retornou_ao_normal": "SIM" if summary["recovered"] else "NÃO DETERMINADO",
-            "evidencias": len(summary["evidence_ids"]),
-        }]
-        return ReportExporter(self.output_dir).pdf("Relatório de Diagnóstico de Campo", rows, f"sessao_{session_id}")
+        session = self.store.get_session(session_id)
+        rows=self.store.query(session_id);facts=SessionEvidenceInterpreter(self.store).extract(session_id)
+        diagnostic = TechnicianDiagnosticEngine().analyze_families(
+            session_id, rows, facts,
+            equipment=f"{session.controller_id} / {session.name}",
+        )
+        return ReportExporter(self.output_dir).diagnostic_pdf(diagnostic, f"sessao_{session_id}")

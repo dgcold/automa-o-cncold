@@ -14,6 +14,7 @@ from typing import Any
 
 from .baseline import BaselineRepository, BaselineStatus
 from .field_diagnostics import BlackBoxStore, TimelineKind
+from .analysis_integration import SessionEvidenceInterpreter
 
 
 class AnalysisState(StrEnum):
@@ -134,6 +135,7 @@ class AnomalyEngine:
         self.blackbox,self.baselines,self.repository,self.algorithm=blackbox,baselines,repository,algorithm or AlgorithmVersion()
 
     def analyze(self,session_id:str,baseline_id:str)->AnomalyResult:
+        session_id=self.blackbox.resolve_session_id(session_id)
         baseline=self.baselines.get(baseline_id)
         if baseline.status not in (BaselineStatus.VALIDATED,BaselineStatus.ACTIVE):raise ValueError("Baseline deve estar VALIDADO ou ATIVO.")
         rows=self.blackbox.query(session_id,kinds=(TimelineKind.SAMPLE,))
@@ -164,6 +166,21 @@ class AnomalyEngine:
         evidence=tuple(dict.fromkeys(i for factor in factors for i in factor.evidence_ids));period=[r["timestamp"] for r in rows]
         explanation=("Comportamento fora da faixa padronizada do baseline." if classification is AnomalyClass.ANOMALOUS else "Comportamento dentro do padrão estatístico avaliado.")+" Não estabelece causa-raiz."
         result=AnomalyResult(f"AI-{uuid.uuid4().hex[:12].upper()}",session_id,baseline_id,self.algorithm.name,self.algorithm.version,AnalysisState.COMPLETED,classification,score,confidence,quality,coverage,min(period),max(period),tuple(groups),tuple(sorted(factors,key=lambda f:f.contribution,reverse=True)),evidence,explanation,None,datetime.now().astimezone().isoformat())
+        self.repository.save(result);return result
+
+    def analyze_recorded(self,identifier:str)->AnomalyResult:
+        """Analyze measurable evidence families without requiring an external baseline."""
+        interpreter=SessionEvidenceInterpreter(self.blackbox);analysis=interpreter.interpret(identifier);session_id=analysis.session_id
+        if analysis.state in {"SEM DADOS","DADOS INSUFICIENTES"}:return self._abstain(session_id,"RELAÇÕES INTERNAS",analysis.quality,analysis.state)
+        rows=self.blackbox.query(session_id,kinds=(TimelineKind.SAMPLE,));periods=[r["timestamp"] for r in rows]
+        factors=[]
+        for fact in analysis.facts:
+            observed=fact.details.get("observed");reference=fact.details.get("reference")
+            observed=float(observed) if isinstance(observed,(int,float)) else 1.0;reference=float(reference) if isinstance(reference,(int,float)) else 0.0
+            distance=abs(observed-reference)/max(abs(reference),.001);factors.append(ContributingFactor(fact.family,observed,reference,distance,min(1.0,max(.5,distance)),"ACIMA" if observed>reference else "ABAIXO",fact.first_timestamp,fact.evidence_ids,fact.description+" Não estabelece causa-raiz."))
+        anomalous=bool(factors);score=100*fmean(f.contribution for f in factors) if factors else 0.0;evidence=tuple(dict.fromkeys(i for f in factors for i in f.evidence_ids))
+        explanation=("A IA identificou relações anormais nas evidências armazenadas." if anomalous else "Operação normal / nenhuma anomalia significativa detectada nas relações avaliadas.")+" ANOMALIA ≠ CAUSA-RAIZ."
+        result=AnomalyResult(f"AI-{uuid.uuid4().hex[:12].upper()}",session_id,"RELAÇÕES INTERNAS ENTRE VARIÁVEIS","CNCold Evidence Families","2.0.0",AnalysisState.COMPLETED,AnomalyClass.ANOMALOUS if anomalous else AnomalyClass.NORMAL,score,min(.95,.65+.03*len(factors)) if anomalous else min(.95,analysis.quality),analysis.quality,1.0,min(periods),max(periods),analysis.variables,tuple(factors),evidence,explanation,None,datetime.now().astimezone().isoformat())
         self.repository.save(result);return result
 
     def _abstain(self,session_id,baseline_id,quality,reason,coverage=0.0):

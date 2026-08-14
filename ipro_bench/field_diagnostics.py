@@ -133,6 +133,19 @@ class BlackBoxStore:
         data["status"] = SessionStatus(data["status"])
         return DiagnosticSession(**data)
 
+    def resolve_session_id(self, identifier: str) -> str:
+        """Accept DIA directly or resolve an EXE recorded in the session notes."""
+        value=identifier.strip()
+        if not value:raise KeyError("Identificador de sessão vazio.")
+        with self._connect() as connection:
+            direct=connection.execute("SELECT id FROM diagnostic_sessions WHERE id=?",(value,)).fetchone()
+            if direct:return str(direct["id"])
+            rows=connection.execute("SELECT id,notes FROM diagnostic_sessions WHERE notes LIKE ? ORDER BY started_ns DESC",(f"%execution_id={value}%",)).fetchall()
+        matches=[row["id"] for row in rows if any(part.strip()==f"execution_id={value}" for part in row["notes"].split(";"))]
+        if len(matches)==1:return str(matches[0])
+        if len(matches)>1:raise ValueError(f"Execução ambígua: {value}")
+        raise KeyError(value)
+
     def sessions(self) -> list[DiagnosticSession]:
         with self._connect() as connection:
             rows = connection.execute("SELECT * FROM diagnostic_sessions ORDER BY started_ns DESC").fetchall()
@@ -158,6 +171,33 @@ class BlackBoxStore:
                  record.severity, record.message, json.dumps(record.evidence, ensure_ascii=False)),
             )
             return int(cursor.lastrowid)
+
+    def append_many(self, session_id: str, records: Iterable[TimelineRecord]) -> int:
+        """Persist an ordered telemetry batch in one atomic transaction."""
+        if self.get_session(session_id).status is not SessionStatus.ACTIVE:
+            raise ValueError("NÃ£o Ã© permitido anexar dados a uma sessÃ£o finalizada.")
+        rows = [
+            (
+                session_id, record.kind.value, record.timestamp, record.timestamp_ns,
+                record.variable_id, record.name,
+                json.dumps(record.value, ensure_ascii=False),
+                json.dumps(record.previous_value, ensure_ascii=False), record.quality,
+                record.severity, record.message,
+                json.dumps(record.evidence, ensure_ascii=False),
+            )
+            for record in records
+        ]
+        if not rows:
+            return 0
+        with self._connect() as connection:
+            connection.executemany(
+                """INSERT INTO timeline_records
+                (session_id, kind, timestamp, timestamp_ns, variable_id, name,
+                 value_json, previous_value_json, quality, severity, message, evidence_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                rows,
+            )
+        return len(rows)
 
     def query(self, session_id: str, *, variable_id: str | None = None,
               kinds: Iterable[TimelineKind] | None = None, start_ns: int | None = None,
@@ -219,32 +259,29 @@ class BlackBoxRecorder:
 
     def ingest(self, samples: Iterable[TelemetrySample]) -> int:
         session_id = self._require_active()
-        count = 0
+        records: list[TimelineRecord] = []
         for sample in samples:
             timestamp_ns = self._ns_from_iso(sample.timestamp)
             record = TimelineRecord(TimelineKind.SAMPLE, sample.timestamp, timestamp_ns,
                 sample.channel_id, sample.name, sample.value, quality=sample.quality.value,
                 message=sample.display_value, evidence=sample.as_record())
-            self.store.append(session_id, record)
-            count += 1
+            records.append(record)
             if sample.channel_id in self._last_values and self._last_values[sample.channel_id] != sample.value:
-                self.store.append(session_id, TimelineRecord(
+                records.append(TimelineRecord(
                     TimelineKind.STATE_CHANGE, sample.timestamp, timestamp_ns, sample.channel_id,
                     sample.name, sample.value, self._last_values[sample.channel_id],
                     sample.quality.value, message="Valor/estado alterado",
                     evidence={"source": sample.source, "connected": sample.connected},
                 ))
-                count += 1
             if sample.channel_id in self._last_quality and self._last_quality[sample.channel_id] != sample.quality.value:
-                self.store.append(session_id, TimelineRecord(
+                records.append(TimelineRecord(
                     TimelineKind.QUALITY_CHANGE, sample.timestamp, timestamp_ns, sample.channel_id,
                     sample.name, sample.quality.value, self._last_quality[sample.channel_id],
                     sample.quality.value, message="Qualidade alterada",
                 ))
-                count += 1
             self._last_values[sample.channel_id] = sample.value
             self._last_quality[sample.channel_id] = sample.quality.value
-        return count
+        return self.store.append_many(session_id, records)
 
     def communication(self, connected: bool, source: str, detail: str = "", timestamp: str | None = None) -> None:
         session_id = self._require_active()

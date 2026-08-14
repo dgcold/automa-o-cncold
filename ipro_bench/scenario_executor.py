@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+from enum import StrEnum
 from pathlib import Path
 
 from .core import DataQuality
@@ -23,6 +24,7 @@ from .telemetry import TelemetrySample
 from .telemetry_bus import TelemetryBus
 from .virtual_electrical import VirtualElectricalInstrumentation
 from .virtual_machine import MachineState, VirtualRefrigerationMachine
+from .analysis_integration import SessionEvidenceInterpreter
 
 
 @dataclass(frozen=True)
@@ -30,6 +32,18 @@ class CriterionResult:
     criterion: str
     outcome: CriterionOutcome
     detail: str
+
+
+class ExecutionStatus(StrEnum):
+    COMPLETED = "CONCLUÍDA"
+    EXECUTION_ERROR = "ERRO DE EXECUÇÃO"
+    CANCELLED = "CANCELADO"
+
+
+class SimulatedMachineCondition(StrEnum):
+    NORMAL = "NORMAL"
+    ANOMALY_DETECTED = "ANOMALIA DETECTADA"
+    SIMULATED_FAULT = "FALHA SIMULADA"
 
 
 @dataclass
@@ -48,6 +62,31 @@ class ExecutionResult:
     technical_result: CriterionOutcome
     report_paths: dict[str, Path] = field(default_factory=dict)
     analysis: dict = field(default_factory=dict)
+
+    @property
+    def execution_status(self) -> ExecutionStatus:
+        if self.status is SimulationStatus.FINISHED:
+            return ExecutionStatus.COMPLETED
+        return ExecutionStatus.CANCELLED
+
+    @property
+    def scenario_verdict(self) -> CriterionOutcome:
+        return self.technical_result
+
+    @property
+    def simulated_condition(self) -> SimulatedMachineCondition:
+        return SimulatedMachineCondition.SIMULATED_FAULT if self.faults else SimulatedMachineCondition.NORMAL
+
+    @property
+    def simulated_condition_detail(self) -> str:
+        names = {item.get("name") for item in self.faults}
+        if "COMPRESSOR_NAO_RETORNA_POS_DEGELO" in names:
+            return "FALHA DE RECUPERAÇÃO PÓS-DEGELO"
+        return self.simulated_condition.value
+
+    @property
+    def diagnosis(self) -> SimulatedMachineCondition:
+        return SimulatedMachineCondition.ANOMALY_DETECTED if self.faults else SimulatedMachineCondition.NORMAL
 
 
 class ScenarioExecutor:
@@ -76,7 +115,8 @@ class ScenarioExecutor:
                 self._apply(pending.pop(0), machine, injector, events, timestamp, engine)
             machine.tick(dt)
             metadata = {"controller": "VIRTUAL_REFRIGERATION_MACHINE", "scenario_id": scenario.id,
-                        "execution_id": engine.execution_id, "session_id": session.id, "seed": seed}
+                        "execution_id": engine.execution_id, "session_id": session.id, "seed": seed,
+                        "machine_state": machine.state.value}
             samples = self._machine_samples(machine, timestamp, metadata) + electrical.samples(machine, timestamp, metadata)
             bus.publish(samples)
             events.observe(machine, timestamp, engine.elapsed)
@@ -91,12 +131,15 @@ class ScenarioExecutor:
         investigation = None
         if first:
             investigation = IncidentAnalyzer(self.store).investigate(session.id, first["id"])
+        interpreted = SessionEvidenceInterpreter(self.store).interpret(session.id)
         result = ExecutionResult(scenario.id, engine.execution_id, stopped.id, seed, engine.elapsed, speed,
             engine.status, bus.published, tuple(asdict(item) for item in injector.injected), tuple(events.events),
             criteria, technical, analysis={"timeline": summary, "defrost": [asdict(item) for item in cycles],
                                            "incident": asdict(investigation) if investigation else "NÃO DETERMINADO",
-                                           "baseline": "NÃO DETERMINADO", "diagnosis": "NÃO DETERMINADO",
-                                           "anomaly": "NÃO DETERMINADO", "health": "DADOS INSUFICIENTES"})
+                                           "baseline": "NÃO DETERMINADO", "diagnosis": interpreted.state,
+                                           "anomaly": interpreted.state, "health": "DADOS INSUFICIENTES",
+                                           "evidence_families": [asdict(item) for item in interpreted.facts],
+                                           "data_quality": interpreted.quality})
         result.report_paths = self._reports(scenario, result)
         self.current = result
         return result
@@ -159,7 +202,11 @@ class ScenarioExecutor:
                "speed": result.speed, "samples": result.samples, "faults": list(result.faults),
                "events": list(result.events), "first_deviation": result.analysis["timeline"].get("first_deviation"),
                "criteria": [asdict(item) for item in result.criteria], "technical_result": result.technical_result.value,
-               "diagnosis": "NÃO DETERMINADO", "anomaly": "NÃO DETERMINADO", "health": "NÃO DETERMINADO"}
+               "execution_status": result.execution_status.value, "scenario_verdict": result.scenario_verdict.value,
+               "simulated_condition": result.simulated_condition.value,
+               "simulated_condition_detail": result.simulated_condition_detail,
+               "diagnosis": result.analysis["diagnosis"], "anomaly": result.analysis["anomaly"],
+               "evidence_families": result.analysis["evidence_families"], "health": "NÃO DETERMINADO"}
         stem = f"execucao_{result.execution_id.lower()}"
         return {"json": self.reports.json([row], stem), "csv": self.reports.csv([row], stem),
                 "pdf": self.reports.pdf("Relatório de Execução Simulada", [row], stem)}

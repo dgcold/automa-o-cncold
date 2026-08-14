@@ -9,7 +9,7 @@ from ipro_bench.field_diagnostics import (
 from ipro_bench.history_store import PersistentHistory
 from ipro_bench.reports import ReportExporter
 from ipro_bench.scenario_catalog import default_scenarios
-from ipro_bench.scenario_executor import ScenarioExecutor
+from ipro_bench.scenario_executor import ExecutionStatus, ScenarioExecutor, SimulatedMachineCondition
 from ipro_bench.scenarios import (
     CriterionOutcome,
     Scenario,
@@ -67,6 +67,51 @@ def test_integrated_end_to_end(tmp_path):
     assert manager.evidence.count("testes") == 3
 
 
+def test_test_01_reproduces_expected_fault_and_passes(tmp_path):
+    scenario = default_scenarios()[0]
+    fault_step = next(step for step in scenario.steps if isinstance(step, ScenarioStep) and step.fault == "COMPRESSOR_NAO_RETORNA_POS_DEGELO")
+    command_step = next(step for step in scenario.steps if isinstance(step, ScenarioStep) and step.action is ScenarioAction.COMMAND_COMPRESSOR)
+    assert fault_step.at_seconds < command_step.at_seconds
+    assert [(criterion.event, criterion.should_exist) for criterion in scenario.criteria] == [
+        ("COMPRESSOR_COMANDADO_SEM_RESPOSTA", True),
+    ]
+
+    store = BlackBoxStore(tmp_path / "blackbox.sqlite3")
+    result = ScenarioExecutor(PersistentHistory(tmp_path / "history.sqlite3"), BlackBoxRecorder(store),
+                              store, ReportExporter(tmp_path / "reports")).execute(
+        scenario, seed=123, speed=100, step_seconds=5)
+
+    assert result.execution_status is ExecutionStatus.COMPLETED
+    assert result.scenario_verdict is CriterionOutcome.PASSED
+    assert result.simulated_condition is SimulatedMachineCondition.SIMULATED_FAULT
+    assert result.simulated_condition_detail == "FALHA DE RECUPERAÇÃO PÓS-DEGELO"
+    assert result.diagnosis is SimulatedMachineCondition.ANOMALY_DETECTED
+    assert "COMPRESSOR_COMANDADO_SEM_RESPOSTA" in {item["event"] for item in result.events}
+    assert "RECUPERACAO" not in {item["event"] for item in result.events}
+
+
+def test_unmet_criterion_still_fails(tmp_path):
+    scenario = Scenario("Critério não atendido", "Offline",
+                        criteria=[TestCriterion("Evento obrigatório", "EVENTO_INEXISTENTE", True)],
+                        duration_seconds=1)
+    store = BlackBoxStore(tmp_path / "blackbox.sqlite3")
+    result = ScenarioExecutor(PersistentHistory(tmp_path / "history.sqlite3"), BlackBoxRecorder(store),
+                              store, ReportExporter(tmp_path / "reports")).execute(
+        scenario, speed=100, step_seconds=1)
+    assert result.execution_status is ExecutionStatus.COMPLETED
+    assert result.scenario_verdict is CriterionOutcome.FAILED
+
+
+def test_execution_exception_remains_an_execution_error(monkeypatch, tmp_path):
+    store = BlackBoxStore(tmp_path / "blackbox.sqlite3")
+    executor = ScenarioExecutor(PersistentHistory(tmp_path / "history.sqlite3"),
+                                BlackBoxRecorder(store), store, ReportExporter(tmp_path / "reports"))
+    monkeypatch.setattr("ipro_bench.scenario_executor.SimulationEngine.run_headless",
+                        lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("falha real")))
+    with pytest.raises(RuntimeError, match="falha real"):
+        executor.execute(default_scenarios()[0], speed=100)
+
+
 @pytest.mark.parametrize("index", range(10))
 def test_all_professional_scenarios_execute(index, tmp_path):
     store = BlackBoxStore(tmp_path / "blackbox.sqlite3")
@@ -75,4 +120,5 @@ def test_all_professional_scenarios_execute(index, tmp_path):
         default_scenarios()[index], seed=100 + index, speed=100, step_seconds=20)
     assert result.samples >= 190
     assert result.status.value == "FINALIZADO"
+    assert result.execution_status is ExecutionStatus.COMPLETED
     assert result.technical_result in (CriterionOutcome.PASSED, CriterionOutcome.FAILED)

@@ -15,12 +15,21 @@ def _scenario(name: str, fault: str | None = None, *, defrost: bool = False) -> 
         steps += [ScenarioStep(300, ScenarioAction.SET_STATE, parameters={"state": MachineState.DEFROST.value}),
                   ScenarioStep(360, ScenarioAction.SET_STATE, parameters={"state": MachineState.DRIPPING.value}),
                   ScenarioStep(390, ScenarioAction.SET_STATE, parameters={"state": MachineState.RETURNING.value}),
-                  ScenarioStep(400, ScenarioAction.SET_STATE, parameters={"state": MachineState.RECOVERY.value}),
-                  ScenarioStep(410, ScenarioAction.COMMAND_COMPRESSOR, parameters={"enabled": True})]
+                  ScenarioStep(400, ScenarioAction.SET_STATE, parameters={"state": MachineState.RECOVERY.value})]
+        if fault == "COMPRESSOR_NAO_RETORNA_POS_DEGELO":
+            steps.append(ScenarioStep(409, ScenarioAction.INJECT_FAULT, fault=fault))
+        steps.append(ScenarioStep(410, ScenarioAction.COMMAND_COMPRESSOR, parameters={"enabled": True}))
+        if fault != "COMPRESSOR_NAO_RETORNA_POS_DEGELO":
+            steps.append(ScenarioStep(600, ScenarioAction.SET_STATE, parameters={"state": MachineState.STABLE.value}))
     if fault:
-        steps.append(ScenarioStep(411 if defrost else 130, ScenarioAction.INJECT_FAULT, fault=fault))
-    criteria = [TestCriterion("Sem desvio de compressor", "COMPRESSOR_COMANDADO_SEM_RESPOSTA", False)]
-    if defrost:
+        if fault != "COMPRESSOR_NAO_RETORNA_POS_DEGELO":
+            fault_time = 305 if fault == "DEGELO_INCOMPLETO" else (411 if defrost else 130)
+            steps.append(ScenarioStep(fault_time, ScenarioAction.INJECT_FAULT, fault=fault))
+    if fault == "COMPRESSOR_NAO_RETORNA_POS_DEGELO":
+        criteria = [TestCriterion("Falha de retorno do compressor reproduzida", "COMPRESSOR_COMANDADO_SEM_RESPOSTA", True)]
+    else:
+        criteria = [TestCriterion("Sem desvio de compressor", "COMPRESSOR_COMANDADO_SEM_RESPOSTA", False)]
+    if defrost and fault != "COMPRESSOR_NAO_RETORNA_POS_DEGELO":
         criteria.append(TestCriterion("Recuperação após degelo", "RECUPERACAO", True))
     return Scenario(name, "Cenário estruturado offline · origem SIMULADOR", steps=steps,
                     criteria=criteria, duration_seconds=700 if defrost else 240)

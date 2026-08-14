@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from .field_diagnostics import BlackBoxStore
+from .analysis_integration import SessionEvidenceInterpreter
 
 
 class ConclusionState(StrEnum):
@@ -36,6 +37,26 @@ class TechnicalRule:
     recommended_test: str = "NÃO DETERMINADO"
     source: str = "REGRA TÉCNICA VALIDADA"
     enabled: bool = True
+
+
+def deterministic_observation_rules() -> tuple[TechnicalRule, ...]:
+    """Cautious rules whose favorable facts are measurable relations, not scenario labels."""
+    return (
+        TechnicalRule("R-ELETRICA-FASES-001","1.0","Diferença relativa observada entre correntes L1/L2/L3","SIMULADOR_ELETRICO",
+            "Possível desequilíbrio de corrente entre fases.",( "phase_current_imbalance",),required_confirmation_facts=("medicao_fisica_tensao_corrente",),
+            missing_information=("Tensão entre fases e inspeção das conexões não estão disponíveis na telemetria.",),
+            recommended_test="Verificar alimentação, conexões, tensão e corrente entre fases.",source="CRITÉRIO DETERMINÍSTICO SOBRE AMOSTRAS L1/L2/L3"),
+        TechnicalRule("R-COMPRESSOR-RETORNO-001","1.0","Comando verdadeiro sem retorno de estado do compressor","SIMULADOR_ELETRICO",
+            "Possível comando do compressor sem confirmação de funcionamento.",( "compressor_command_without_feedback",),required_confirmation_facts=("verificacao_fisica_circuito_potencia",),
+            missing_information=("O motivo físico da ausência de retorno não está disponível na telemetria.",),
+            recommended_test="Verificar proteções, alimentação, circuito de potência e intertravamentos.",source="CRITÉRIO DETERMINÍSTICO SOBRE COMANDO E RETORNO"),
+        TechnicalRule("R-VENTILADOR-COND-001","1.0","Retorno desligado em estado de refrigeração","SIMULADOR_ELETRICO","Possível falha de confirmação do ventilador do condensador.",( "condenser_fan_without_feedback",),required_confirmation_facts=("verificacao_fisica_ventilador",),recommended_test="Verificar comando, retorno, alimentação e funcionamento do ventilador."),
+        TechnicalRule("R-SENSOR-001","1.0","Leitura ausente ou qualidade inválida","SIMULADOR_ELETRICO","Possível sensor inválido ou leitura inconsistente.",( "invalid_sensor_reading",),required_confirmation_facts=("verificacao_fisica_sensor",),recommended_test="Verificar sensor, cabeamento, conexão e leitura local."),
+        TechnicalRule("R-COMUNICACAO-001","1.0","Perda de comunicação observada","SIMULADOR_ELETRICO","Possível interrupção de comunicação.",( "communication_loss_observed",),required_confirmation_facts=("verificacao_fisica_rede",),recommended_test="Verificar meio físico, alimentação, endereçamento e estabilidade da comunicação."),
+        TechnicalRule("R-DEGELO-001","1.0","Ciclo ou resposta térmica de degelo incompleta","SIMULADOR_ELETRICO","Possível ciclo de degelo incompleto.",( "incomplete_defrost_cycle",),required_confirmation_facts=("verificacao_fisica_degelo",),recommended_test="Verificar fases, aquecimento, gotejamento e retorno à refrigeração."),
+        TechnicalRule("R-RECUPERACAO-001","1.0","Resposta térmica lenta após retorno","SIMULADOR_ELETRICO","Possível recuperação térmica lenta.",( "slow_thermal_recovery",),required_confirmation_facts=("verificacao_fisica_carga_termica",),recommended_test="Verificar carga térmica, circulação de ar e capacidade frigorífica."),
+        TechnicalRule("R-CORRENTE-COMP-001","1.0","Corrente do compressor elevada e sustentada","SIMULADOR_ELETRICO","Possível corrente elevada do compressor.",( "high_compressor_current",),required_confirmation_facts=("medicao_fisica_corrente",),recommended_test="Verificar corrente, tensão, pressões e condição mecânica do compressor."),
+    )
 
 
 @dataclass(frozen=True)
@@ -156,7 +177,9 @@ class ExplainableDiagnosticEngine:
         self.evidence_store,self.repository,self.rules=evidence_store,repository,tuple(rules)
 
     def evaluate(self, session_id: str, facts: Mapping[str,Iterable[int]], *, context: str,
-                 event_id: int|None=None, first_deviation_id: int|None=None) -> list[HypothesisConclusion]:
+                 event_id: int|None=None, first_deviation_id: int|None=None,
+                 fact_descriptions: Mapping[str,str]|None=None) -> list[HypothesisConclusion]:
+        session_id=self.evidence_store.resolve_session_id(session_id)
         valid_ids={row["id"] for row in self.evidence_store.query(session_id)}
         normalized={fact:tuple(int(i) for i in ids) for fact,ids in facts.items()}
         for ids in normalized.values():
@@ -164,7 +187,7 @@ class ExplainableDiagnosticEngine:
         output=[]
         for rule in self.rules:
             if not rule.enabled or rule.context not in (context,"QUALQUER"):continue
-            favorable=[EvidenceArgument(fact,f"Fato observado: {fact}",normalized[fact]) for fact in rule.favorable_facts if normalized.get(fact)]
+            favorable=[EvidenceArgument(fact,(fact_descriptions or {}).get(fact,f"Fato observado: {fact}"),normalized[fact]) for fact in rule.favorable_facts if normalized.get(fact)]
             contrary=[EvidenceArgument(fact,f"Evidência contrária: {fact}",normalized[fact]) for fact in rule.contrary_facts if normalized.get(fact)]
             if not favorable:continue
             support=len(favorable)/max(1,len(rule.favorable_facts));opposition=len(contrary)/max(1,len(rule.contrary_facts)) if rule.contrary_facts else 0
@@ -176,6 +199,16 @@ class ExplainableDiagnosticEngine:
                 ConclusionState.HYPOTHESIS,datetime.now().astimezone().isoformat(),event_id,session_id)
             self.repository.save(conclusion);output.append(conclusion)
         return sorted(output,key=lambda item:item.confidence,reverse=True)
+
+    def evaluate_recorded(self, identifier: str, *, context: str="SIMULADOR_ELETRICO") -> list[HypothesisConclusion]:
+        """Evaluate facts derived from the session samples and their real record IDs."""
+        interpreter=SessionEvidenceInterpreter(self.evidence_store);session_id=interpreter.resolve(identifier)
+        extracted=interpreter.extract(session_id);facts={item.name:item.evidence_ids for item in extracted};descriptions={item.name:interpreter.evidence_text(item) for item in extracted}
+        rows=self.evidence_store.query(session_id)
+        event=next((row for row in rows if row["kind"] in ("ALARME","DESVIO")),None)
+        deviation=next((row for row in rows if row["kind"]=="DESVIO"),None)
+        return self.evaluate(session_id,facts,context=context,event_id=event["id"] if event else None,
+            first_deviation_id=deviation["id"] if deviation else None,fact_descriptions=descriptions)
 
     def competing(self, conclusions: Iterable[HypothesisConclusion]) -> list[dict[str,Any]]:
         return [{"id":item.id,"description":item.description,"confidence":item.confidence,"state":item.state.value,

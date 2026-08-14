@@ -15,6 +15,7 @@ from .explainable_diagnostics import (
     DiagnosticRepository,
     ExplainableDiagnosticEngine,
     RuleCatalog,
+    deterministic_observation_rules,
 )
 from .field_diagnostics import BlackBoxRecorder, BlackBoxStore
 from .history_store import PersistentHistory
@@ -87,7 +88,7 @@ def build_application_services(project_root: str | Path, rs485_logger=None) -> A
         TcpReadOnlyService(settings.ipro.host, settings.ipro.port, settings.ipro.timeout_seconds),
         Rs485SimulatorService(logger=rs485_logger), defrost,
         IncidentAnalyzer(blackbox_store, baseline_service), diagnostic_repository, rule_catalog,
-        ExplainableDiagnosticEngine(blackbox_store, diagnostic_repository, rule_catalog.load()),
+        ExplainableDiagnosticEngine(blackbox_store, diagnostic_repository, rule_catalog.load()+deterministic_observation_rules()),
         anomaly_repository, anomaly_engine, health_repository,
         OperationalHealthEngine(blackbox_store, anomaly_repository, defrost, health_repository),
         ScenarioExecutor(history, blackbox, blackbox_store, reports),

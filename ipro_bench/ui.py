@@ -46,6 +46,11 @@ from .operational_health import PeriodKind
 from .scenario_catalog import default_scenarios
 from .scenarios import Scenario
 from .test_manager import BenchTest, TestResult
+from .technician_diagnostics import (
+    ConfirmationDecision, TechnicianConfirmationRepository,
+    TechnicianDiagnosticEngine, display_value, technician_label,
+)
+from .analysis_integration import SessionEvidenceInterpreter
 
 STYLE = """
 QMainWindow, QWidget { background: #0b1220; color: #dce6f2; font-family: 'Segoe UI'; font-size: 13px; }
@@ -180,6 +185,8 @@ class MainWindow(QMainWindow):
         self.state.tcp_port = self.services.settings.ipro.port
         self.state.unit_id = self.services.settings.ipro.unit_id
         self.active_controller = self.controllers.get("ipro")
+        self.technician_diagnostic_engine = TechnicianDiagnosticEngine()
+        self.technician_confirmations = TechnicianConfirmationRepository(self.services.project_root / "dados" / "confirmacoes_tecnico.sqlite3")
         self.probe_thread: TcpProbeThread | None = None
         self.setWindowTitle(self.services.settings.name)
         self.resize(1420, 860)
@@ -466,6 +473,10 @@ class MainWindow(QMainWindow):
 
     def _trends_page(self) -> QWidget:
         page, layout = self._page()
+        controls=QHBoxLayout();self.historical_session=QLineEdit();self.historical_session.setPlaceholderText("Sessão histórica DIA-* ou execução EXE-*")
+        load=QPushButton("Carregar sessão histórica");load.clicked.connect(self._load_historical_session)
+        self.historical_status=QLabel("TEMPO REAL · SEM DADOS · NÃO CONECTADO",objectName="muted")
+        controls.addWidget(self.historical_session,1);controls.addWidget(load);controls.addWidget(self.historical_status);layout.addLayout(controls)
         layout.addWidget(QLabel("Gráficos", objectName="title"))
         self.sensor_chart = TrendChart("Sensores e processo")
         self.electrical_chart = TrendChart("Corrente total / compressor / L1 / L2 / L3")
@@ -505,13 +516,24 @@ class MainWindow(QMainWindow):
         self.sessions_table = QTableWidget(0, 5)
         self.sessions_table.setHorizontalHeaderLabels(("ID", "CONTROLADOR", "NOME", "INÍCIO", "STATUS"))
         self.sessions_table.horizontalHeader().setStretchLastSection(True)
+        self.sessions_table.itemSelectionChanged.connect(self._select_historical_session)
         layout.addWidget(self.sessions_table)
         self._refresh_sessions()
         return page
 
     def _timeline_page(self) -> QWidget:
         page, layout = self._page()
-        layout.addWidget(QLabel("Timeline", objectName="title"))
+        layout.addWidget(QLabel("DIAGNÓSTICO DA OCORRÊNCIA", objectName="title"))
+        self.technician_diagnostic = QTextEdit(); self.technician_diagnostic.setReadOnly(True); self.technician_diagnostic.setMaximumHeight(250)
+        self.technician_diagnostic.setText("STATUS DA MÁQUINA: DADOS INSUFICIENTES\n\nPRIMEIRO DESVIO DETECTADO: NÃO DETERMINADO\n\nAGUARDANDO CONFIRMAÇÃO DO TÉCNICO")
+        layout.addWidget(self.technician_diagnostic)
+        confirmation=QHBoxLayout(); self.technician_name=QLineEdit(); self.technician_name.setPlaceholderText("Técnico")
+        self.technician_note=QLineEdit(); self.technician_note.setPlaceholderText("Observação")
+        confirmation.addWidget(self.technician_name); confirmation.addWidget(self.technician_note,1)
+        for label,decision in (("Confirmar diagnóstico",ConfirmationDecision.CONFIRMED),("Rejeitar hipótese",ConfirmationDecision.REJECTED),("Marcar inconclusivo",ConfirmationDecision.INCONCLUSIVE)):
+            button=QPushButton(label);button.clicked.connect(lambda checked=False,value=decision:self._confirm_technician_diagnostic(value));confirmation.addWidget(button)
+        layout.addLayout(confirmation)
+        layout.addWidget(QLabel("EVENTOS RELACIONADOS / REGISTROS BRUTOS", objectName="title"))
         filters = QHBoxLayout()
         self.timeline_variable = QLineEdit()
         self.timeline_variable.setPlaceholderText("Filtrar variável")
@@ -633,6 +655,9 @@ class MainWindow(QMainWindow):
         layout.addLayout(cards)
         self.defrost_timeline = TrendChart("Timeline visual do ciclo de degelo")
         layout.addWidget(self.defrost_timeline)
+        self.defrost_diagnostic=QTextEdit();self.defrost_diagnostic.setReadOnly(True);self.defrost_diagnostic.setMaximumHeight(150)
+        self.defrost_diagnostic.setText("ANÁLISE DO CICLO DE DEGELO\nDADOS INSUFICIENTES")
+        layout.addWidget(self.defrost_diagnostic)
         self.defrost_events = QTableWidget(0,6)
         self.defrost_events.setHorizontalHeaderLabels(("FASE/EVENTO","INÍCIO","FIM","DURAÇÃO","QUALIDADE","EVIDÊNCIAS"))
         self.defrost_events.horizontalHeader().setStretchLastSection(True)
@@ -699,8 +724,9 @@ class MainWindow(QMainWindow):
         layout.addLayout(grid)
         self.ai_explanation=QLabel("DADO REAL ≠ ANÁLISE DETERMINÍSTICA ≠ ANÁLISE IA ≠ HIPÓTESE ≠ DIAGNÓSTICO CONFIRMADO",objectName="muted")
         self.ai_explanation.setWordWrap(True);layout.addWidget(self.ai_explanation)
-        self.ai_factors=QTableWidget(0,8)
+        self.ai_factors=QTableWidget(0,9)
         self.ai_factors.setHorizontalHeaderLabels(("VARIÁVEL","OBSERVADO","BASELINE","DISTÂNCIA","CONTRIBUIÇÃO","DIREÇÃO","INÍCIO","EVIDÊNCIAS"))
+        self.ai_factors.setHorizontalHeaderLabels(("VARIÁVEL/FAMÍLIA","OBSERVADO","REFERÊNCIA","DISTÂNCIA","CONTRIBUIÇÃO","DIREÇÃO","INÍCIO","EVIDÊNCIAS","INTERPRETAÇÃO"))
         self.ai_factors.horizontalHeader().setStretchLastSection(True);layout.addWidget(self.ai_factors)
         layout.addWidget(QLabel("Histórico das análises",objectName="title"))
         self.ai_history=QTableWidget(0,7);self.ai_history.setHorizontalHeaderLabels(("ID","SESSÃO","MODELO","ESTADO","CLASSIFICAÇÃO","SCORE","CONFIANÇA"));self.ai_history.horizontalHeader().setStretchLastSection(True);layout.addWidget(self.ai_history)
@@ -974,7 +1000,7 @@ class MainWindow(QMainWindow):
         self.simulation_status.setText("EM EXECUÇÃO · 100x · ORIGEM: SIMULADOR")
         self.simulation_thread = SimulationThread(self.services.scenario_executor, scenario)
         self.simulation_thread.completed.connect(lambda result: self._simulation_completed(row, scenario, result))
-        self.simulation_thread.failed.connect(lambda message: self.simulation_status.setText(f"ERRO · {message}"))
+        self.simulation_thread.failed.connect(lambda message: self.simulation_status.setText(f"ERRO DE EXECUÇÃO · {message}"))
         self.simulation_thread.start()
 
     def _simulation_completed(self, row, scenario, result) -> None:
@@ -983,6 +1009,12 @@ class MainWindow(QMainWindow):
         self.simulation_status.setText(
             f"{result.status.value} · {result.execution_id} · {result.session_id} · "
             f"{result.samples} AMOSTRAS · {result.technical_result.value} · ORIGEM: SIMULADOR")
+
+        self.diagnostic_session.setText(result.session_id)
+        self.diagnostic_context.setText("SIMULADOR_ELETRICO")
+        self.diagnostic_facts.clear()
+        self.ai_session.setText(result.session_id)
+        self.ai_baseline.clear()
 
     def _start_blackbox(self) -> None:
         name = self.session_name.text().strip() or "Diagnóstico offline"
@@ -1042,6 +1074,7 @@ class MainWindow(QMainWindow):
         self.blackbox_status.update_value("RELATÓRIO GERADO", str(target))
 
     def _timeline_session_id(self) -> str | None:
+        if getattr(self,"historical_session_id",None):return self.historical_session_id
         if self.blackbox.session:
             return self.blackbox.session.id
         sessions = self.blackbox_store.sessions()
@@ -1069,12 +1102,29 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Timeline", "Cursor temporal inválido.")
                 return
         rows = self.blackbox_store.query(session_id, variable_id=variable, kinds=kinds, start_ns=start_ns, end_ns=end_ns)
+        complete_rows = self.blackbox_store.query(session_id)
+        facts=SessionEvidenceInterpreter(self.blackbox_store).extract(session_id)
+        diagnostic = self.technician_diagnostic_engine.analyze_families(session_id,complete_rows,facts,equipment=self.active_controller.identity.display_name)
+        first=diagnostic.first_deviation
+        first_text="NÃO IDENTIFICADO" if first is None else (f"{first.timestamp} | {first.variable} | anterior {display_value(first.previous_value)} | atual {display_value(first.current_value)} | diferença {display_value(first.difference)} | esperado {first.expected} | observado {first.observed} | severidade {first.severity} | evidências {', '.join(map(str,first.evidence_ids))}")
+        latest=self.technician_confirmations.latest(session_id); confirmation_text=latest["decision"]+" por "+latest["technician"] if latest else "PENDENTE"
+        self.technician_diagnostic.setText("\n\n".join((f"STATUS DA MÁQUINA\n{diagnostic.machine_status}",f"PRIMEIRO DESVIO DETECTADO\n{first_text}",f"FALHA / ANOMALIA IDENTIFICADA\n{diagnostic.anomaly}",f"O QUE ACONTECEU\n{diagnostic.what_happened}",f"O QUE FOI OBSERVADO\n"+"\n".join(diagnostic.observations),f"EVIDÊNCIAS\n{', '.join(map(str,diagnostic.evidence_ids)) or 'SEM DADOS'}",f"POSSÍVEIS CAUSAS / HIPÓTESES\n"+"\n".join("- "+x for x in diagnostic.hypotheses),f"IMPACTO\n{diagnostic.impact}",f"O QUE O TÉCNICO DEVE VERIFICAR\n"+"\n".join("- "+x for x in diagnostic.recommended_checks),f"CONFIANÇA\n{'NÃO DETERMINADA' if diagnostic.confidence is None else f'{diagnostic.confidence:.0%}'}",f"CONFIRMAÇÃO DO TÉCNICO\n{confirmation_text}")))
         self.timeline_table.setRowCount(len(rows))
         for row, item in enumerate(rows):
+            item = dict(item)
+            item["variable_id"] = technician_label(item.get("variable_id"))
             evidence = f"registro #{item['id']}"
             values = (item["timestamp"], item["kind"], item["variable_id"] or "—", item["previous_value"], item["value"], item["quality"] or "—", item["severity"], evidence)
             for column, value in enumerate(values):
                 self.timeline_table.setItem(row, column, QTableWidgetItem("SEM DADOS" if value is None else str(value)))
+
+    def _confirm_technician_diagnostic(self,decision:ConfirmationDecision)->None:
+        session_id=self._timeline_session_id()
+        if not session_id:return
+        diagnostic=self.technician_diagnostic_engine.analyze(session_id,self.blackbox_store.query(session_id))
+        try:self.technician_confirmations.record(session_id,self.technician_name.text(),diagnostic.anomaly,decision,self.technician_note.text())
+        except ValueError as error:QMessageBox.warning(self,"Confirmação do técnico",str(error));return
+        self._refresh_timeline()
 
     def _calculate_correlation(self) -> None:
         session_id = self._timeline_session_id()
@@ -1167,6 +1217,9 @@ class MainWindow(QMainWindow):
         self.defrost_cards["Pré-degelo"].update_value("15 min","Janela de análise")
         self.defrost_cards["Qualidade"].update_value(f"{cycle.quality_score:.1%}",cycle.status.value)
         self.defrost_timeline.set_values([phase.duration_seconds for phase in cycle.phases])
+        diagnostic=self.technician_diagnostic_engine.analyze_defrost(cycle,equipment=self.active_controller.identity.display_name)
+        first="NÃO IDENTIFICADO" if diagnostic.first_deviation is None else f"{diagnostic.first_deviation.timestamp} - {diagnostic.first_deviation.variable}"
+        self.defrost_diagnostic.setText("\n".join(("ANÁLISE DO CICLO DE DEGELO",f"RESULTADO: {diagnostic.anomaly}",f"PRIMEIRO DESVIO: {first}",*diagnostic.observations,f"MOTIVO / HIPÓTESE: {diagnostic.hypotheses[0]}","CONFIRMAÇÃO DO TÉCNICO: PENDENTE")))
         rows=list(cycle.phases)+list(cycle.alarms)+list(cycle.state_events)
         self.defrost_events.setRowCount(len(rows))
         for row,item in enumerate(rows):
@@ -1205,6 +1258,9 @@ class MainWindow(QMainWindow):
         self.status.setText(f"  DEGELO · {len(differences)} diferenças · NÃO É DIAGNÓSTICO")
 
     def _investigate_event(self) -> None:
+        if not self.incident_event.text().strip():
+            self.status.setText("  Informe um ID de evidência/evento para investigar um evento específico.")
+            return
         try:
             result=self.incident_analyzer.investigate(self.incident_session.text().strip(),int(self.incident_event.text().strip()),WindowPreset(self.incident_window.currentText()))
         except (KeyError,ValueError) as error:
@@ -1233,6 +1289,38 @@ class MainWindow(QMainWindow):
             session,event=item.strip().rsplit(":",1);result.append((session,int(event)))
         return result
 
+    def _select_historical_session(self)->None:
+        row=self.sessions_table.currentRow()
+        if row<0 or not self.sessions_table.item(row,0):return
+        identifier=self.sessions_table.item(row,0).text()
+        self.historical_session.setText(identifier)
+        self._load_historical_session()
+
+    def _prepare_session_views(self, session_id: str, rows: list[dict]) -> None:
+        """Propagate one historical session and remove derived data from the previous one."""
+        self.historical_session_id=session_id
+        for name in ("diagnostic_session","ai_session","incident_session","defrost_session"):
+            widget=getattr(self,name,None)
+            if widget:widget.setText(session_id)
+        events=[row for row in rows if row.get("kind") != TimelineKind.SAMPLE.value]
+        self.incident_event.setText(str(events[0]["id"]) if events else "")
+        self.incident_timeline.setRowCount(0)
+        self.ai_factors.setRowCount(0)
+        self.ai_explanation.setText("Sessão alterada. Execute a análise offline para calcular resultados desta sessão.")
+        self.diagnostic_summary.setText("Sessão alterada. Avalie as regras desta sessão; nenhum resultado anterior foi reutilizado.")
+
+    def _load_historical_session(self)->None:
+        try:session_id=self.blackbox_store.resolve_session_id(self.historical_session.text().strip())
+        except (KeyError,ValueError) as error:self.historical_status.setText(f"SESSÃO NÃO ENCONTRADA · {error}");return
+        all_rows=self.blackbox_store.query(session_id,limit=self.services.settings.analysis.export_limit)
+        rows=[row for row in all_rows if row.get("kind") == TimelineKind.SAMPLE.value];sensor_ids={"temperature_chamber","temperature_evaporator","pressure_suction","pressure_discharge"};electrical_ids={"current_total","current_compressor","current_l1","current_l2","current_l3"}
+        sensors=[float(r["value"]) for r in rows if r.get("variable_id") in sensor_ids and isinstance(r.get("value"),(int,float))]
+        electrical=[float(r["value"]) for r in rows if r.get("variable_id") in electrical_ids and isinstance(r.get("value"),(int,float))]
+        self.sensor_chart.set_values(sensors);self.electrical_chart.set_values(electrical)
+        self._prepare_session_views(session_id,all_rows)
+        self._refresh_timeline()
+        self.historical_status.setText(f"MODO HISTÓRICO · {session_id} · {len(rows)} AMOSTRAS · {len(all_rows)-len(rows)} EVENTOS")
+
     def _compare_incidents(self) -> None:
         try:result=self.incident_analyzer.compare_events(self._parse_occurrences(self.similar_events.text()))
         except (ValueError,KeyError) as error:self.status.setText(f"  COMPARAÇÃO · {error}");return
@@ -1255,10 +1343,14 @@ class MainWindow(QMainWindow):
 
     def _evaluate_diagnostics(self) -> None:
         try:
-            facts=json.loads(self.diagnostic_facts.toPlainText() or "{}")
-            conclusions=self.diagnostic_engine.evaluate(self.diagnostic_session.text().strip(),facts,
-                context=self.diagnostic_context.text().strip(),event_id=int(self.diagnostic_event.text()) if self.diagnostic_event.text().strip() else None,
-                first_deviation_id=int(self.diagnostic_deviation.text()) if self.diagnostic_deviation.text().strip() else None)
+            raw_facts=self.diagnostic_facts.toPlainText().strip()
+            if raw_facts:
+                facts=json.loads(raw_facts)
+                conclusions=self.diagnostic_engine.evaluate(self.diagnostic_session.text().strip(),facts,
+                    context=self.diagnostic_context.text().strip() or "SIMULADOR_ELETRICO",event_id=int(self.diagnostic_event.text()) if self.diagnostic_event.text().strip() else None,
+                    first_deviation_id=int(self.diagnostic_deviation.text()) if self.diagnostic_deviation.text().strip() else None)
+            else:
+                conclusions=self.diagnostic_engine.evaluate_recorded(self.diagnostic_session.text().strip(),context=self.diagnostic_context.text().strip() or "SIMULADOR_ELETRICO")
         except (ValueError,KeyError,json.JSONDecodeError) as error:
             self.diagnostic_summary.setText(f"AVALIAÇÃO REJEITADA · {error}");return
         self._refresh_hypotheses()
@@ -1276,7 +1368,9 @@ class MainWindow(QMainWindow):
         self._refresh_hypotheses();self.diagnostic_summary.setText(f"{result.id} · {result.state.value} · {result.causality}")
 
     def _run_ai_analysis(self) -> None:
-        try:result=self.anomaly_engine.analyze(self.ai_session.text().strip(),self.ai_baseline.text().strip())
+        try:
+            baseline=self.ai_baseline.text().strip()
+            result=self.anomaly_engine.analyze(self.ai_session.text().strip(),baseline) if baseline else self.anomaly_engine.analyze_recorded(self.ai_session.text().strip())
         except (ValueError,KeyError) as error:self.status.setText(f"  ANÁLISE IA · {error}");return
         self.ai_cards["Estado da análise"].update_value(result.state.value,result.classification.value)
         self.ai_cards["Score de anomalia"].update_value("NÃO DETERMINADO" if result.anomaly_score is None else f"{result.anomaly_score:.1f}/100","ANOMALIA NÃO É CAUSA-RAIZ")
@@ -1289,7 +1383,7 @@ class MainWindow(QMainWindow):
         self.ai_explanation.setText(result.explanation+" · CAUSALIDADE "+result.causality+" · DIAGNÓSTICO "+result.confirmed_diagnosis)
         self.ai_factors.setRowCount(len(result.factors))
         for row,item in enumerate(result.factors):
-            values=(item.variable_id,item.observed_average,item.baseline_average,item.standardized_distance,item.contribution,item.direction,item.first_anomalous_timestamp or "NÃO DETERMINADO",", ".join(map(str,item.evidence_ids)))
+            values=(item.variable_id,item.observed_average,item.baseline_average,item.standardized_distance,item.contribution,item.direction,item.first_anomalous_timestamp or "NÃO DETERMINADO",", ".join("E"+str(value) for value in item.evidence_ids),item.explanation)
             for col,value in enumerate(values):self.ai_factors.setItem(row,col,QTableWidgetItem(str(value)))
         self._refresh_ai_history();self.status.setText(f"  ANÁLISE IA · {result.classification.value} · CAUSA NÃO DETERMINADA")
 
