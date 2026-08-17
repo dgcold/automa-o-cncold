@@ -21,6 +21,7 @@ from .field_diagnostics import BlackBoxRecorder, BlackBoxStore
 from .history_store import PersistentHistory
 from .incident_analysis import IncidentAnalyzer
 from .mapping import ModbusMapRepository
+from .machine_scan import MachineScanAnalyzer, MachineScanRepository
 from .operational_health import HealthRepository, OperationalHealthEngine
 from .reports import ReportExporter
 from .scenario_executor import ScenarioExecutor
@@ -60,6 +61,8 @@ class ApplicationServices:
     health_repository: HealthRepository
     health_engine: OperationalHealthEngine
     scenario_executor: ScenarioExecutor
+    machine_scan_repository: MachineScanRepository
+    machine_scan_analyzer: MachineScanAnalyzer
 
 
 def build_application_services(project_root: str | Path, rs485_logger=None) -> ApplicationServices:
@@ -92,5 +95,6 @@ def build_application_services(project_root: str | Path, rs485_logger=None) -> A
         anomaly_repository, anomaly_engine, health_repository,
         OperationalHealthEngine(blackbox_store, anomaly_repository, defrost, health_repository),
         ScenarioExecutor(history, blackbox, blackbox_store, reports),
+        MachineScanRepository(root / "dados" / "varreduras_maquina.sqlite3"), MachineScanAnalyzer(),
     )
     return services

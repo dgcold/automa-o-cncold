@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QScrollArea,
     QSpinBox,
     QStackedWidget,
     QTableWidget,
@@ -58,6 +59,7 @@ from .analysis_integration import SessionEvidenceInterpreter
 from .defrost_investigation import FAMILY_DESCRIPTIONS, investigate_defrost
 from .coil_calculator import CoilGeometry, FinnedCoilCalculator
 from .refrigeration_analysis import RefrigerationAnalyzer
+from .machine_scan import EngineeringPoint, Measurement, STAGE_ORDER
 from .ui_components import MultiSeriesChart
 from refrigerantes import REFRIGERANTES
 
@@ -174,7 +176,7 @@ class MainWindow(QMainWindow):
         "Dashboard", "Sensores", "I/O", "Medição Elétrica", "Modbus", "Mapa",
         "Cenários", "Testes", "Caixa-Preta", "Timeline", "Gráficos", "Histórico", "Evidências",
         "Baseline", "Baseline × Sessão", "Análise de Degelo", "Degelo × Referência", "Investigação de Evento", "Diagnóstico", "Análise IA", "Análise Frigorífica", "Serpentina Aletada", "Saúde da Máquina", "Relatórios",
-    )
+    ) + ("Varredura da Máquina",)
 
     def __init__(self, project_root: Path) -> None:
         super().__init__()
@@ -188,6 +190,7 @@ class MainWindow(QMainWindow):
             "diagnostic_repository", "rule_catalog", "diagnostic_engine",
             "anomaly_repository", "anomaly_engine", "health_repository",
             "health_engine", "controllers", "map_repository", "test_manager", "tcp", "rs485",
+            "machine_scan_repository", "machine_scan_analyzer",
         ):
             setattr(self, name, getattr(self.services, name))
         self.state.ipro_ip = self.services.settings.ipro.host
@@ -272,6 +275,7 @@ class MainWindow(QMainWindow):
         self.pages.addWidget(self._coil_page())
         self.pages.addWidget(self._health_page())
         self.pages.addWidget(self._reports_page())
+        self.pages.addWidget(self._machine_scan_page())
         content_layout.addWidget(self.pages, 1)
         self.status = QLabel("  Sistema pronto · nenhuma conexão aberta · iPro protegido contra escrita")
         self.status.setFixedHeight(28)
@@ -286,6 +290,115 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(24, 22, 24, 22)
         layout.setSpacing(16)
         return page, layout
+
+    def _machine_scan_page(self) -> QWidget:
+        page = QWidget()
+        page_layout = QVBoxLayout(page); page_layout.setContentsMargins(0, 0, 0, 0); page_layout.setSpacing(0)
+        self.scan_scroll_area = QScrollArea(); self.scan_scroll_area.setWidgetResizable(True); self.scan_scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        self.scan_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scan_scroll_content = QWidget()
+        layout = QVBoxLayout(self.scan_scroll_content); layout.setContentsMargins(24, 14, 24, 20); layout.setSpacing(10)
+        self.scan_scroll_area.setWidget(self.scan_scroll_content); page_layout.addWidget(self.scan_scroll_area)
+        layout.addWidget(QLabel("VARREDURA TÉCNICA DA MÁQUINA", objectName="title"))
+        layout.addWidget(QLabel("CÁLCULO DE ENGENHARIA → VALOR MEDIDO → DESVIO → LOCALIZAÇÃO → EVIDÊNCIAS → HIPÓTESES → VERIFICAÇÕES", objectName="muted"))
+        form = QFormLayout()
+        form.setVerticalSpacing(7)
+        self.scan_chamber = QDoubleSpinBox(); self.scan_chamber.setRange(-80, 60); self.scan_chamber.setValue(-18); self.scan_chamber.setSuffix(" °C")
+        self.scan_expected_evap = QDoubleSpinBox(); self.scan_expected_evap.setRange(-80, 40); self.scan_expected_evap.setValue(-27); self.scan_expected_evap.setSuffix(" °C")
+        self.scan_observed_evap = QDoubleSpinBox(); self.scan_observed_evap.setRange(-80, 40); self.scan_observed_evap.setValue(-33); self.scan_observed_evap.setSuffix(" °C")
+        form.addRow("Câmara", self.scan_chamber); form.addRow("Evaporação — CÁLCULO DE ENGENHARIA", self.scan_expected_evap); form.addRow("Evaporação — VALOR MEDIDO", self.scan_observed_evap)
+        layout.addLayout(form)
+        layout.addWidget(QLabel("MEDIÇÕES DA MÁQUINA", objectName="title"))
+        machine_form = QFormLayout()
+        machine_form.setVerticalSpacing(7)
+        self.scan_refrigerant = QComboBox(); self.scan_refrigerant.addItem("NÃO INFORMADO", None)
+        for refrigerant in REFRIGERANTES: self.scan_refrigerant.addItem(refrigerant, refrigerant)
+        self.scan_evap_out_pressure = QLineEdit(); self.scan_evap_out_pressure.setPlaceholderText("vazio = não medido")
+        self.scan_evap_out_pressure_unit = QComboBox(); self.scan_evap_out_pressure_unit.addItems(("PSIG", "bar(g)", "kPa(g)"))
+        evap_pressure_row = QWidget(); evap_pressure_layout = QHBoxLayout(evap_pressure_row); evap_pressure_layout.setContentsMargins(0, 0, 0, 0); evap_pressure_layout.addWidget(self.scan_evap_out_pressure); evap_pressure_layout.addWidget(self.scan_evap_out_pressure_unit)
+        self.scan_evap_out_temperature = QLineEdit(); self.scan_evap_out_temperature.setPlaceholderText("vazio = não medido · °C")
+        self.scan_comp_in_pressure = QLineEdit(); self.scan_comp_in_pressure.setPlaceholderText("vazio = não medido")
+        self.scan_comp_in_pressure_unit = QComboBox(); self.scan_comp_in_pressure_unit.addItems(("PSIG", "bar(g)", "kPa(g)"))
+        comp_pressure_row = QWidget(); comp_pressure_layout = QHBoxLayout(comp_pressure_row); comp_pressure_layout.setContentsMargins(0, 0, 0, 0); comp_pressure_layout.addWidget(self.scan_comp_in_pressure); comp_pressure_layout.addWidget(self.scan_comp_in_pressure_unit)
+        self.scan_comp_in_temperature = QLineEdit(); self.scan_comp_in_temperature.setPlaceholderText("vazio = não medido · °C")
+        machine_form.addRow("Refrigerante", self.scan_refrigerant)
+        machine_form.addRow("SAÍDA DO EVAPORADOR — Pressão", evap_pressure_row); machine_form.addRow("SAÍDA DO EVAPORADOR — Temperatura °C", self.scan_evap_out_temperature)
+        machine_form.addRow("ENTRADA DO COMPRESSOR — Pressão", comp_pressure_row); machine_form.addRow("ENTRADA DO COMPRESSOR — Temperatura °C", self.scan_comp_in_temperature)
+        layout.addLayout(machine_form)
+        layout.addWidget(QLabel("LINHA DE LÍQUIDO — CONTINUAÇÃO DA INVESTIGAÇÃO", objectName="cardTitle"))
+        liquid_form = QFormLayout()
+        liquid_form.setVerticalSpacing(7)
+        self.scan_condenser_out_pressure = QLineEdit(); self.scan_condenser_out_pressure.setPlaceholderText("vazio = não medido · PSIG")
+        self.scan_condenser_out_temperature = QLineEdit(); self.scan_condenser_out_temperature.setPlaceholderText("vazio = não medido · °C")
+        self.scan_valve_in_pressure = QLineEdit(); self.scan_valve_in_pressure.setPlaceholderText("vazio = não medido · PSIG")
+        self.scan_valve_in_temperature = QLineEdit(); self.scan_valve_in_temperature.setPlaceholderText("vazio = não medido · °C")
+        liquid_form.addRow("Pressão saída condensador — PSIG", self.scan_condenser_out_pressure); liquid_form.addRow("Temperatura saída condensador — °C", self.scan_condenser_out_temperature)
+        liquid_form.addRow("Pressão antes da válvula — PSIG", self.scan_valve_in_pressure); liquid_form.addRow("Temperatura antes da válvula — °C", self.scan_valve_in_temperature)
+        layout.addLayout(liquid_form)
+        self.scan_pressure_notice = QLabel("Pressão será registrada, mas só será convertida em temperatura de saturação com refrigerante, unidade e propriedades termodinâmicas válidas.", objectName="muted"); self.scan_pressure_notice.setWordWrap(True); layout.addWidget(self.scan_pressure_notice)
+        actions = QHBoxLayout()
+        manual_button = QPushButton("EXECUTAR / ATUALIZAR VARREDURA"); manual_button.clicked.connect(self._run_machine_scan); actions.addWidget(manual_button)
+        simulation_button = QPushButton("CARREGAR DADOS SIMULADOS"); simulation_button.clicked.connect(self._load_scan_simulation); actions.addWidget(simulation_button)
+        layout.addLayout(actions)
+        self.scan_map = QTableWidget(len(STAGE_ORDER), 2); self.scan_map.setHorizontalHeaderLabels(("MAPA DE VARREDURA", "STATUS")); self.scan_map.horizontalHeader().setStretchLastSection(True)
+        self.scan_map.setMinimumHeight(310); self.scan_map.setMaximumHeight(310); self.scan_map.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff); self.scan_map.setFocusPolicy(Qt.FocusPolicy.NoFocus); layout.addWidget(self.scan_map)
+        self.scan_result = QTextEdit(); self.scan_result.setReadOnly(True); self.scan_result.setMinimumHeight(440); self.scan_result.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff); self.scan_result.setFocusPolicy(Qt.FocusPolicy.NoFocus); layout.addWidget(self.scan_result)
+        return page
+
+    @staticmethod
+    def _optional_scan_value(field: QLineEdit) -> float | None:
+        text = field.text().strip().replace(",", ".")
+        return None if not text else float(text)
+
+    def _load_scan_simulation(self) -> None:
+        self.scan_chamber.setValue(-18); self.scan_expected_evap.setValue(-27); self.scan_observed_evap.setValue(-33)
+        for field in (self.scan_evap_out_pressure, self.scan_evap_out_temperature, self.scan_comp_in_pressure, self.scan_comp_in_temperature, self.scan_condenser_out_pressure, self.scan_condenser_out_temperature, self.scan_valve_in_pressure, self.scan_valve_in_temperature): field.clear()
+        self.scan_refrigerant.setCurrentIndex(0)
+        self._run_machine_scan()
+
+    def _run_machine_scan(self) -> None:
+        chamber = self.scan_chamber.value(); expected = self.scan_expected_evap.value(); observed = self.scan_observed_evap.value()
+        point = EngineeringPoint.create("PONTO 01", chamber, {"evaporation_temperature_c": expected})
+        measurements = [Measurement("chamber_temperature_c", chamber, "°C"), Measurement("evaporation_temperature_c", observed, "°C")]
+        optional = (
+            ("evaporator_outlet_pressure", self.scan_evap_out_pressure, self.scan_evap_out_pressure_unit.currentText()),
+            ("evaporator_outlet_temperature_c", self.scan_evap_out_temperature, "°C"),
+            ("compressor_inlet_pressure", self.scan_comp_in_pressure, self.scan_comp_in_pressure_unit.currentText()),
+            ("compressor_inlet_temperature_c", self.scan_comp_in_temperature, "°C"),
+            ("condenser_outlet_pressure", self.scan_condenser_out_pressure, "PSIG"),
+            ("condenser_outlet_temperature_c", self.scan_condenser_out_temperature, "°C"),
+            ("expansion_valve_inlet_pressure", self.scan_valve_in_pressure, "PSIG"),
+            ("expansion_valve_inlet_temperature_c", self.scan_valve_in_temperature, "°C"),
+        )
+        try:
+            for name, field, unit in optional:
+                value = self._optional_scan_value(field)
+                if value is not None: measurements.append(Measurement(name, value, unit, source="MEDIÇÃO INFORMADA PELO USUÁRIO"))
+        except ValueError:
+            self.scan_result.setText("MEDIÇÃO INVÁLIDA — use somente valores numéricos nos campos de pressão e temperatura."); return
+        result = self.machine_scan_analyzer.analyze((point,), tuple(measurements), refrigerant=self.scan_refrigerant.currentData())
+        self.machine_scan_repository.save(result)
+        for row, stage in enumerate(result.stages):
+            self.scan_map.setItem(row, 0, QTableWidgetItem(stage.name)); self.scan_map.setItem(row, 1, QTableWidgetItem(stage.status.value))
+        deviations = "\n".join(f"{item.name}: {item.value:+.1f} {item.unit}" for item in result.deviations) or "NÃO DETERMINADO"
+        missing = "\n".join(f"{index}. {item.capitalize()}" for index, item in enumerate(result.missing_measurements, 1)) or "Nenhuma medição adicional para as etapas avaliadas"
+        confidence = "NÃO DETERMINADA" if result.confidence is None else f"{result.confidence:.0%}"
+        purpose = f"\n\nFINALIDADE\n{result.missing_measurements_purpose}" if result.missing_measurements_purpose else ""
+        thermo = result.thermodynamic_note or "Nenhuma conversão pressão → temperatura de saturação foi aplicada."
+        received = []
+        trace = []
+        for item in result.thermodynamic_points:
+            gauge = "NÃO INFORMADA" if item.pressure_gauge is None else f"{item.pressure_gauge:.3f} {item.pressure_unit}"
+            temperature = "NÃO INFORMADA" if item.measured_temperature_c is None else f"{item.measured_temperature_c:.2f} °C"
+            received.append(f"{item.name}: pressão {gauge}; temperatura {temperature}")
+            absolute = "NÃO DETERMINADA" if item.pressure_absolute_pa is None else f"{item.pressure_absolute_pa:.2f} Pa(abs)"
+            saturation = "NÃO DETERMINADA" if item.saturation_temperature_c is None else f"{item.saturation_temperature_c:.2f} °C"
+            superheat = "NÃO DETERMINADO" if item.superheat_k is None else f"{item.superheat_k:.2f} K"
+            trace.append(f"{item.name}: {item.status}; pressão absoluta {absolute}; saturação {saturation}; superaquecimento {superheat}")
+        requirement = result.continuation_requirement or "Nenhum requisito termodinâmico adicional identificado neste estágio."
+        self.scan_result.setText(f"CÁLCULO DE ENGENHARIA\nCâmara: {chamber:.1f} °C\nEvaporação esperada: {expected:.1f} °C\nTD esperado: {chamber-expected:.1f} K\n\nMÁQUINA / VALOR MEDIDO\nCâmara: {chamber:.1f} °C\nEvaporação observada: {observed:.1f} °C\nTD observado: {chamber-observed:.1f} K\n\nDESVIO\n{deviations}\n\nETAPA PRELIMINAR / CONDIÇÃO TÉRMICA GERAL\n{result.preliminary_stage.value}\n\nETAPAS AVALIADAS\n{result.evaluated_stage_count}\n\nLOCALIZAÇÃO FÍSICA DO DESVIO\n{result.deviation_location}\n\nMOTIVO\n{result.localization_reason}\n\nMEDIÇÕES RECEBIDAS\n{chr(10).join(received)}\n\nAVALIAÇÃO TERMODINÂMICA DAS PRESSÕES\n{thermo}\n{chr(10).join(trace)}\n\nMEDIÇÕES NECESSÁRIAS PARA CONTINUAR\n{missing}{purpose}\n\nREQUISITO PARA CONTINUAR\n{requirement}\n\nDIAGNÓSTICO\n{result.diagnosis}\n\nHIPÓTESE PRINCIPAL\n{result.primary_hypothesis}\n\nCONFIANÇA\n{confidence} — {result.confidence_reason}")
+        self.scan_result.setMinimumHeight(max(440, self.scan_result.document().blockCount() * 21 + 36))
+        self.status.setText(f"  VARREDURA · {result.id} · {result.diagnosis}")
 
     def _dashboard(self) -> QWidget:
         page, layout = self._page()
